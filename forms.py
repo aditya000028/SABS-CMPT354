@@ -6,7 +6,7 @@ from wtforms.validators import DataRequired, Length, Email, EqualTo
 class RegistrationForm(FlaskForm):
     firstName = StringField('First Name', validators=[DataRequired(), Length(min=2, max=50)])
     lastName = StringField('Last Name', validators=[DataRequired(), Length(min=2, max=50)])
-    email = StringField('Email',validators=[Email()])
+    email = StringField('Email',validators=[Email(), DataRequired()])
     phoneNumber = StringField('Phone Number', validators=[DataRequired(), Length(min=2, max=50)])
     password = PasswordField('Password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
@@ -20,6 +20,13 @@ class AddForm(FlaskForm):
     price = DecimalField('price', validators=[DataRequired()])
     stock = IntegerField('stock', validators=[DataRequired()])
     submit = SubmitField('Add')
+
+class LoginForm(FlaskForm):
+    email = StringField('Email',validators=[Email(), DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    remember = BooleanField('Remember Me')
+    submit = SubmitField('Login')
+
 
 # class BlogForm(FlaskForm):
 #     username = SelectField('Username', choices=[], coerce=int)
