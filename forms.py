@@ -12,6 +12,14 @@ class RegistrationForm(FlaskForm):
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Sign Up')
 
+class AddForm(FlaskForm):
+    itemid = StringField('itemid', validators=[DataRequired()])
+    itemName = StringField('itemName', validators=[DataRequired()])
+    brand = StringField('brand', validators=[DataRequired()])
+    size = StringField('size', validators=[DataRequired()])
+    price = StringField('price', validators=[DataRequired()])
+    stock = StringField('stock', validators=[DataRequired()])
+    submit = SubmitField('Add')
 
 # class BlogForm(FlaskForm):
 #     username = SelectField('Username', choices=[], coerce=int)

@@ -17,17 +17,17 @@
 # @app.route("/")
 # @app.route("/home")
 # def home():
-    
+
 #     conn = mysql.connector.connect(user='xxxx', password='xxxx', host='localhost', database="sabsdb")
 #     cursor = conn.cursor()
 #     cursor.execute("USE sabsdb")
-    
+
 #     #Display all items from the 'items' table
 #     conn.row_factory = dict_factory
 #     c = conn.cursor()
-    
+
 #     c.execute("SELECT * FROM items")
-    
+
 #     items = c.fetchall()
 
 #     return render_template('home.html', items=items)
@@ -45,7 +45,7 @@
 
 #         points = 10
 #         currentdate = str(date.today())
-        
+
 #         #Add the new blog into the 'blogs' table
 #         query = "Insert into members(fname, lname, password, points, registeredDate, phoneNumber) VALUES (%s, %s, %s, %s, %s, %s)"
 #         c.execute(query, (form.firstName.data, form.lastName.data, form.password.data, int(points), currentdate, form.phoneNumber.data)) #Execute the query
@@ -61,7 +61,7 @@
 
 
 from flask import Flask, render_template, url_for, flash, redirect
-from forms import RegistrationForm
+from forms import RegistrationForm, AddForm
 from datetime import date
 import sqlite3
 
@@ -90,15 +90,15 @@ execute_sql()
 @app.route("/")
 @app.route("/home")
 def home():
-    
+
     conn = sqlite3.connect('sabs.db')
-    
+
     #Display all items from the 'items' table
     conn.row_factory = dict_factory
     c = conn.cursor()
-    
+
     c.execute("SELECT * FROM items")
-    
+
     items = c.fetchall()
 
     return render_template('home.html', items=items)
@@ -114,7 +114,7 @@ def register():
 
         points = 10
         currentdate = str(date.today())
-        
+
         #Add the new blog into the 'members' table
         query = "Insert into members VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)"
         c.execute(query, (form.firstName.data, form.lastName.data, form.email.data, form.password.data, points, currentdate, form.phoneNumber.data)) #Execute the query
@@ -123,6 +123,25 @@ def register():
         flash(f'Account created for {form.firstName.data} {form.lastName.data}!', 'success')
         return redirect(url_for('home'))
     return render_template('register.html', title='Register', form=form)
+
+@app.route("/add", methods=['GET', 'POST'])
+def add():
+    form = AddForm()
+
+    if form.validate_on_submit():
+        conn = sqlite3.connect('sabs.db')
+        c = conn.cursor()
+
+        try:
+            query = "Insert into items(itemid, itemName, brand, size, price, stock) VALUES (?, ?, ?, ?, ?, ?)"
+            c.execute(query, (form.itemid.data, form.itemName.data, form.brand.data, form.size.data, form.price.data, form.stock.data)) #Execute the query
+            conn.commit() #Commit the changes
+            flash(f'{form.itemName.data} added to database with the ID of {form.itemid.data}!', 'success')
+            return redirect(url_for('home'))
+        except:
+            flash(f'{form.itemName.data} failed to be added to the DB!', 'danger')
+
+    return render_template('add.html', title='Add', form=form)
 
 if __name__ == '__main__':
     app.run(debug=True)
