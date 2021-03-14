@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextField, TextAreaField, SelectField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextField, TextAreaField, SelectField,  IntegerField, DecimalField
 from wtforms.validators import DataRequired, Length, Email, EqualTo
 
 
@@ -13,12 +13,12 @@ class RegistrationForm(FlaskForm):
     submit = SubmitField('Sign Up')
 
 class AddForm(FlaskForm):
-    itemid = StringField('itemid', validators=[DataRequired()])
+    itemid = IntegerField('itemid', validators=[DataRequired()])
     itemName = StringField('itemName', validators=[DataRequired()])
     brand = StringField('brand', validators=[DataRequired()])
-    size = StringField('size', validators=[DataRequired()])
-    price = StringField('price', validators=[DataRequired()])
-    stock = StringField('stock', validators=[DataRequired()])
+    size = DecimalField('size', validators=[DataRequired()])
+    price = DecimalField('price', validators=[DataRequired()])
+    stock = IntegerField('stock', validators=[DataRequired()])
     submit = SubmitField('Add')
 
 # class BlogForm(FlaskForm):
