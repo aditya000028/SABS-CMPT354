@@ -73,7 +73,7 @@ login_manager = LoginManager(app)
 login_manager.login_view = "login"
 
 class Member(UserMixin):
-    def __init__(self, id, fname, lname, email, password, points, registeredDate, phoneNumber):
+    def __init__(self, id, fname, lname, email, password, points, registeredDate, companyName, memberAddress, birthdate):
         self.id = id
         self.fname = fname
         self.lname = lname
@@ -81,7 +81,9 @@ class Member(UserMixin):
         self.password = password
         self.points = points
         self.registeredDate = registeredDate
-        self.phoneNumber = phoneNumber
+        self.companyName = companyName
+        self.memberAddress = memberAddress
+        self.birthdate = birthdate
         self.authenticated = False
 
     def is_active(self):
@@ -101,12 +103,12 @@ class Member(UserMixin):
 def load_member(member_id):
     conn = sqlite3.connect('sabs.db')
     cursor = conn.cursor()
-    cursor.execute("SELECT * from members WHERE id = (?)", str(member_id))
+    cursor.execute("SELECT * from member WHERE memberID = (?)", str(member_id))
     row = cursor.fetchone()
     if row is None:
         return None
-    else:
-        return Member(int(row[0]), row[1], row[2], row[3], row[4], row[5], row[6], row[7])
+    else:        
+        return Member(int(row[0]), row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9])
 
 
 # Create our tables and insert a few entries
@@ -139,7 +141,7 @@ def home():
     conn.row_factory = dict_factory
     c = conn.cursor()
     
-    c.execute("SELECT * FROM items")
+    c.execute("SELECT * FROM item")
     
     items = c.fetchall()
 
@@ -157,12 +159,21 @@ def register():
 
         points = 10
         currentdate = str(date.today())
+        companyName = 'SABS General Store'
         
-        #Add the new blog into the 'members' table
+        # Add the new blog into the 'member' table
         # Note: first value is NULL because sqlite automatically takes care of id
-        query = "INSERT into members VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)"
-        c.execute(query, (registration_form.firstName.data, registration_form.lastName.data, registration_form.email.data, registration_form.password.data, points, currentdate, registration_form.phoneNumber.data)) #Execute the query
-        conn.commit() #Commit the changes
+        query = "INSERT into member VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        c.execute(query, (
+            registration_form.firstName.data, 
+            registration_form.lastName.data, 
+            registration_form.email.data, 
+            registration_form.password.data, 
+            points, currentdate, companyName, 
+            registration_form.address.data, 
+            registration_form.birthdate.data
+            )) # Execute the query
+        conn.commit() # Commit the changes
 
         flash(f'Account created for {registration_form.firstName.data} {registration_form.lastName.data}!', 'success')
         return redirect(url_for('home'))
