@@ -107,18 +107,7 @@ def load_member(member_id):
     row = cursor.fetchone()
     if row is None:
         return None
-    else:
-        print(int(row[0]))
-        print(row[1])
-        print(row[2])
-        print(row[3])
-        print(row[4])
-        print(row[5])
-        print(row[6])
-        print(row[7])
-        print(row[8])
-        print(row[9])
-        
+    else:        
         return Member(int(row[0]), row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9])
 
 
@@ -172,7 +161,7 @@ def register():
         currentdate = str(date.today())
         companyName = 'SABS General Store'
         
-        #Add the new blog into the 'members' table
+        # Add the new blog into the 'member' table
         # Note: first value is NULL because sqlite automatically takes care of id
         query = "INSERT into member VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         c.execute(query, (
@@ -183,8 +172,8 @@ def register():
             points, currentdate, companyName, 
             registration_form.address.data, 
             registration_form.birthdate.data
-            )) #Execute the query
-        conn.commit() #Commit the changes
+            )) # Execute the query
+        conn.commit() # Commit the changes
 
         flash(f'Account created for {registration_form.firstName.data} {registration_form.lastName.data}!', 'success')
         return redirect(url_for('home'))
