@@ -46,19 +46,33 @@
                     {% endif %}
                 </div>
                 <div class="form-group">
-                    {{ registration_form.phoneNumber.label(class="form-control-label") }}
+                    {{ registration_form.address.label(class="form-control-label") }}
 
-                    {% if registration_form.phoneNumber.errors %}
-                        {{ registration_form.phoneNumber(class="form-control form-control-lg is-invalid") }}
+                    {% if registration_form.address.errors %}
+                        {{ registration_form.address(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
-                            {% for error in registration_form.phoneNumber.errors %}
+                            {% for error in registration_form.address.errors %}
                                 <span>{{ error }}</span>
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ registration_form.phoneNumber(class="form-control form-control-lg") }}
+                        {{ registration_form.address(class="form-control form-control-lg") }}
                     {% endif %}
                 </div>
+                <div class="form-group">
+                    {{ registration_form.birthdate.label(class="form-control-label") }}
+
+                    {% if registration_form.birthdate.errors %}
+                        {{ registration_form.birthdate(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in registration_form.birthdate.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ registration_form.birthdate(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>                
                 <div class="form-group">
                     {{ registration_form.password.label(class="form-control-label") }}
 
