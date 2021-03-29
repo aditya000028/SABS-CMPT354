@@ -1,16 +1,17 @@
 {% extends "layout.html" %}
 {% block content %}
-    {% for item in items %}
+    {% for x in range(length) %}
         <article class="media content-section">
           <div class="media-body">
             <div class="article-metadata">
-              <a class="mr-2" href="#">{{ item.itemID }}</a>
+              <a class="mr-2" href="#">{{ items[x].itemID }}</a>
             </div>
-            <h2><a class="article-title" href="#">{{ item.itemName }}</a></h2>
-            <p class="article-content">{{ item.brand }}</p>
-            <p class="article-content">{{ item.size }}</p>
-            <p class="article-content">{{ item.price }}</p>
-            <p class="article-content">{{ item.stock }}</p>
+            <h2><a class="article-title" href="#">{{ items[x].itemName }}</a></h2>
+            <p class="article-content">{{ items[x].brand }}</p>
+            <p class="article-content">{{ items[x].size }}</p>
+            <p class="article-content">{{ items[x].price }}</p>
+            <p class="article-content">{{ items[x].stock }}</p>
+            <img src={{itemNamesList[x]}}>
           </div>
         </article>
     {% endfor %}
