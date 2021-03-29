@@ -3,22 +3,16 @@
     {% for item in items %}
         <article class="media">
           <div class="media-body"> 
-            <!-- <div class="article-metadata"> -->
+            <div class="article-metadata">
             <!-- <a class="mr-2" href="#">{{ item.itemid }}</a> -->
             <!-- </div> -->
             <!-- <img src="question_mark.png" alt="Girl in a jacket"> -->
             <div class="rectangle"></div>
-        <article class="media content-section">
-          <div class="media-body">
-            <div class="article-metadata">
-              <a class="mr-2" href="#">{{ item.itemID }}</a>
-            </div>
             <h2><a class="article-title" href="#">{{ item.itemName }}</a></h2>
             <p class="article-content" id="price"><b>{{ item.price }}</b></p>
             <p class="article-content"><b>Brand:</b>{{ item.brand }}</p>
             <p class="article-content"><b>Dimensions:</b>{{ item.size }}</p>
             <p class="article-content"><b>In Stock:</b>{{ item.stock }}</p>
-            <!--<p class="article-content"><b>Brand:</b>{{ item.brand }} <b>Dimensions:</b>{{ item.size }} <b>In Stock:</b>{{ item.stock }}</p>-->
           </div>
         </article>
     {% endfor %}
