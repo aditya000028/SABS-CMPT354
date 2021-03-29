@@ -47,6 +47,8 @@ CREATE TABLE employee
     firstName varchar(255) NOT NULL,
     lastName varchar(255) NOT NULL,
     startDate char(10) NOT NULL,
+    email varchar(255) NOT NULL,
+    password varchar(255) NOT NULL,
     FOREIGN KEY (managerID) REFERENCES manager(managerID)
         ON DELETE SET DEFAULT
   		ON UPDATE CASCADE,
@@ -289,11 +291,11 @@ Insert into store values (4, 'SABS General Store', 550000);
 Insert into store values (5, 'SABS General Store', 450000);
 
 /* Add employee to table */
-Insert into employee values (1, 20.50, 1, 'Emmanuel', 'Okafor', '12-12-1999');
-Insert into employee values (2, 20.50, 2, 'Dion', 'Sanders', '10-11-1998');
-Insert into employee values (3, 20.50, 3, 'Ray', 'Allen', '12-12-1999');
-Insert into employee values (4, 20.50, 4, 'Wayne', 'Gretzky', '12-12-1999');
-Insert into employee values (5, 20.50, 5, 'Brett', 'Hull', '12-12-1999');
+Insert into employee values (1, 20.50, 1, 'Emmanuel', 'Okafor', '12-12-1999', 'emmanuel@gmail.com', '1234');
+Insert into employee values (2, 20.50, 2, 'Dion', 'Sanders', '10-11-1998', 'dion@gmail.com', '1234');
+Insert into employee values (3, 20.50, 3, 'Ray', 'Allen', '12-12-1999', 'ray@gmail.com', '1234');
+Insert into employee values (4, 20.50, 4, 'Wayne', 'Gretzky', '12-12-1999', 'wayne@gmail.com', '1234');
+Insert into employee values (5, 20.50, 5, 'Brett', 'Hull', '12-12-1999', 'brett@gmail.com', '1234');
 
 /* Add warehouse to table */
 Insert into warehouse values (1, '1234 Hoot St.');
@@ -314,7 +316,7 @@ Insert into department values ('Miscellaneous');
 Insert into item(itemID, itemName, brand, size, price, stock, discountPercent, depName, companyName) values (1, 'Blue pens 8-pack', 'BIC', '8x8x2', 24.99, 10, 0, 'Stationery', 'SABS General Store');
 Insert into item(itemID, itemName, brand, size, price, stock, discountPercent, depName, companyName) values (2, 'Red pens 8-pack', 'BIC', '8x8x2', 24.99, 10, 0, 'Stationery', 'SABS General Store');
 Insert into item(itemID, itemName, brand, size, price, stock, discountPercent, depName, companyName) values (3, 'Bubblegum', 'Excel', '4x4x2', 9.99, 50, 0, 'Miscellaneous', 'SABS General Store');
-Insert into item(itemID, itemName, brand, size, price, stock, discountPercent, depName, companyName) values (4, 'Call of Duty: Modern Warfare', 'Activision', '6x62', 79.99, 5, 0, 'Electronics', 'SABS General Store');
+Insert into item(itemID, itemName, brand, size, price, stock, discountPercent, depName, companyName) values (4, 'Call of Duty - Modern Warfare', 'Activision', '6x62', 79.99, 5, 0, 'Electronics', 'SABS General Store');
 Insert into item(itemID, itemName, brand, size, price, stock, discountPercent, depName, companyName) values (5, 'PS5', 'Sony', '20x20x20', 699.99, 2, 0, 'Electronics', 'SABS General Store');
 
 /* Add cart to table */

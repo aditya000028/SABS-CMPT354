@@ -66,7 +66,7 @@ def dict_factory(cursor, row):
         d[col[0]] = row[idx]
     return d
 
-
+# Run initialize the db before the app starts running
 initialize_db()
 
 @app.route("/")
@@ -83,7 +83,15 @@ def home():
     
     items = c.fetchall()
 
-    return render_template('home.html', items=items)
+    # Create the path to display item images
+    itemNamesList = []
+    for x in items:
+        name = "../static/images/"
+        name = name + str(x["itemName"]).replace(" ", "")
+        name = name + ".png"
+        itemNamesList.append(name)
+
+    return render_template('home.html', items=items, itemNamesList=itemNamesList, length=len(items))
 
 
 @app.route("/register", methods=['GET', 'POST'])
