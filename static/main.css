@@ -28,12 +28,15 @@ h1, h2, h3, h4, h5, h6 {
   background: #ffffff;
   padding: 10px 20px;
   border: 1px solid #dddddd;
-  border-radius: 3px;
+  border-radius: 25px;
   margin-bottom: 20px;
+  margin-left: 200px;
+  width: 100%;
 }
 
 .article-title {
   color: #444444;
+  text-align: center;
 }
 
 a.article-title:hover {
@@ -43,6 +46,8 @@ a.article-title:hover {
 
 .article-content {
   white-space: pre-line;
+  text-align: center;
+  margin-bottom: 0px;
 }
 
 .article-img {
@@ -77,4 +82,29 @@ a.article-title:hover {
 
 .account-heading {
   font-size: 2.5rem;
+}
+
+.media {
+  height: 390px;
+  width: 50%;
+  border: 10px solid #dddddd;
+  border-radius: 25px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+#price {
+  border: 5px solid #dddddd;
+  width: 50%;
+  margin-left: 87.5px;
+  margin-bottom: 10px;
+}
+
+.rectangle {
+  height: 150px;
+  width: 50%;
+  margin-left: 87.5px;
+  border: 3px solid #dddddd;
+  border-radius: 25px;
+  margin-top: 25px;
 }
