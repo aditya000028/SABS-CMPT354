@@ -1,17 +1,17 @@
 {% extends "layout.html" %}
 {% block content %}
-    {% for x in range(length) %}
-        <article class="media">
-          <div class="media-body">
-            <div class="article-metadata">
-            <div class="rectangle"></div>
-            <h2><a class="article-title" href="#">{{ items[x].itemName }}</a></h2>
-            <p class="article-content" id="price"><b>{{ items[x].price }}</b></p>
-            <p class="article-content"><b>Brand:</b>{{ items[x].brand }}</p>
-            <p class="article-content"><b>Dimensions:</b>{{ items[x].size }}</p>
-            <p class="article-content"><b>In Stock:</b>{{ items[x].stock }}</p>
-            <img src={{itemNamesList[x]}}>
+    <div class="row p-2">
+      {% for x in range(length) %}
+        <div class="container-fluid media align-items-lg-center pt-5">
+          <img class="img-fluid w-50 ml-lg-5 order-1 or-lg-2" style="max-height: 365px;" src={{itemNamesList[x]}}>
+          <div class="media-body order-2 order-lg-1 pl-5">
+            <h2><a href="#">{{ items[x].itemName }}</a></h2>
+            <p><b> {{ items[x].price }}</b></p>
+            <p><b>Brand:</b> {{ items[x].brand }}</p>
+            <p><b>Dimensions:</b> {{ items[x].size }}</p>
+            <p><b>In Stock:</b> {{ items[x].stock }}</p>
           </div>
-        <article>
-    {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
 {% endblock content %}
