@@ -132,7 +132,7 @@ CREATE TABLE item
     companyName varchar(255) NOT NULL,
   	CHECK(price > 0),
   	CHECK(stock >= 0),
-  	CHECK(discountpercent >= 0),
+  	CHECK(discountPercent >= 0),
     FOREIGN KEY(companyName) REFERENCES company(companyName)
   		on delete cascade
   		ON UPDATE CASCADE,
@@ -222,17 +222,37 @@ CREATE TABLE manages
 CREATE TABLE buys
 (
     itemID INTEGER,
+    itemName varchar(255) NOT NULL,
+    brand varchar(255) NOT NULL,
+    size vachar(255),
+    price FLOAT NOT NULL,
+    discountPercent INTEGER NOT NULL,
     memberID INTEGER NOT NULL, 
     receipt text NOT NULL,
+    date_of_purchase INTEGER NOT NULL, 
     cartID INTEGER NOT NULL,
   	CHECK(itemID > 0),
     CHECK(memberID > 0),
     CHECK(cartID > 0),
     FOREIGN KEY(itemID) REFERENCES item(itemID),
+    FOREIGN KEY(itemName) REFERENCES item(itemName),
+    FOREIGN KEY(brand) REFERENCES item(brand),
+    FOREIGN KEY(size) REFERENCES item(size),
+    FOREIGN KEY(price) REFERENCES item(price),
+    FOREIGN KEY(discountPercent) REFERENCES item(discountPercent),
     FOREIGN KEY(memberID) REFERENCES member(memberID),
     FOREIGN KEY(cartID) REFERENCES cart(cartID)
-  		on delete CASCADE
 );
+
+-- CREATE TRIGGER date_and_time_validate_buys
+-- 	BEFORE INSERT ON buys
+-- BEGIN 
+-- SELECT
+-- 	CASE 
+--     	WHEN NEW.date_of_purchase NOT LIKE '__-__-____' THEN RAISE(ABORT, 'Invalid purchase date')
+--       WHEN NEW.time_of_purchase NOT LIKE '__:__:__' THEN RAISE(ABORT, 'Invalid purchase time')
+--     END;
+-- END;
 
 CREATE TABLE delivers
 (
@@ -355,11 +375,11 @@ Insert into manages values (4, 4);
 Insert into manages values (5, 5);
 
 /* Add buys to table */
-Insert into buys values (1, 1, 'You have bought Blue pens 8-pack', 1);
-Insert into buys values (2, 2, 'You have bought Red pens 8-pack', 2);
-Insert into buys values (3, 3, 'You have bought Bubblegum', 3);
-Insert into buys values (4, 4, 'You have bought COD: Modern Warfare', 4);
-Insert into buys values (5, 5, 'You have bought PS5', 5);
+Insert into buys values (1, 'Blue pens 8-pack', 'BIC', '8x8x2', 24.99, 0, 1, 'You have bought Blue pens 8-pack', 1615978318, 1);
+Insert into buys values (2, 'Red pens 8-pack', 'BIC', '8x8x2', 24.99, 0, 2, 'You have bought Red pens 8-pack', strftime('%s', 'now'), 2);
+Insert into buys values (3, 'Bubblegum', 'Excel', '4x4x2', 9.99, 0, 3, 'You have bought Bubblegum', strftime('%s', 'now'), 3);
+Insert into buys values (4, 'Call of Duty - Modern Warfare', 'Activision', '6x62', 79.99, 0, 4, 'You have bought Call of Duty - Modern Warfare', strftime('%s', 'now'), 4);
+Insert into buys values (5, 'PS5', 'Sony', '20x20x20', 699.99, 0, 5, 'You have bought PS5', strftime('%s', 'now'), 5);
 
 /* Add delivers to table */
 Insert into delivers values (1, 1, 1);
