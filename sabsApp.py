@@ -1,6 +1,6 @@
 from flask import Flask, render_template, url_for, flash, redirect, request, Response
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
-from forms import RegistrationForm, LoginForm, TimeSelectForm, EditInformationForm
+from forms import RegistrationForm, LoginForm, TimeSelectForm, EditInformationForm, SearchForm
 from classes.member import Member
 import datetime
 import time
@@ -71,9 +71,9 @@ def home():
     
     items = c.fetchall()
 
-    itemNamesList = item_name_path(items)
+    item_names_list = item_name_path(items)
 
-    return render_template('home.html', items=items, itemNamesList=itemNamesList, length=len(items))
+    return render_template('home.html', items=items, item_names_list=item_names_list, length=len(items))
 
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -134,7 +134,7 @@ def login():
 
     return render_template('login.html', title='Login', form=form)
 
-@app.route("/pastPurchases", methods=['GET', 'POST'])
+@app.route("/profile/pastPurchases", methods=['GET', 'POST'])
 @login_required
 def pastPurchases():
 
@@ -177,7 +177,9 @@ def profile():
 @app.route("/logout")
 @login_required
 def logout():
+    name = current_user.fname
     logout_user()
+    flash(f'{name} has been logged out!', 'success')
     return redirect(url_for('home'))
 
 @app.route("/customerReceipt", methods=['GET'])
@@ -186,7 +188,7 @@ def customer_receipt():
     return render_template('customerReceipt.html', title='Customer Receipt')
 
 
-@app.route("/editInfo", methods=['GET', 'POST'])
+@app.route("/profile/editInfo", methods=['GET', 'POST'])
 @login_required
 def editInfo():
 
@@ -232,7 +234,24 @@ def editInfo():
         return(redirect(url_for('profile')))
 
 
-    return render_template('editInfo.html', form=form, title='Edit your Information')
+    return render_template('editInfo.html', form=form, title='Edit your information')
+
+@app.route('/searchResults')
+def searchResults():
+    
+    user_query = "%"
+    temp = request.args.get("q")
+    user_query = user_query + str(temp) + "%"
+    conn = db_connection()
+    c = conn.cursor()
+
+    query = "SELECT * FROM item WHERE itemName LIKE (?)"
+    c.execute(query, [user_query])
+
+    matching_items = c.fetchall()
+    matching_items_images = item_name_path(matching_items)
+
+    return render_template('searchResults.html', matching_items=matching_items, matching_items_images=matching_items_images, length=len(matching_items), title='Search results')
 
 
 if __name__ == '__main__':
