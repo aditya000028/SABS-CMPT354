@@ -3,7 +3,7 @@
     <div class="container">
         <form method="POST" action="" id="TimeForm" onchange="SubmitTimeSelect()">
             <div class="row">
-                {{ length }} item(s) purchased
+                <p class="font-weight-bold">{{ length }} item(s) purchased</p>
                 {{ form.hidden_tag() }}
                 {% for subfield in form.timeInput %}
                         <div class="col">

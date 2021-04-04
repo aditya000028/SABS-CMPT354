@@ -26,10 +26,3 @@ class TimeSelectForm(FlaskForm):
 class EditInformationForm(RegistrationForm):
     submit_hidden = HiddenField('Hidden', id="hidden", default="test")
     update = SubmitField('Update')
-
-
-# class BlogForm(FlaskForm):
-#     username = SelectField('Username', choices=[], coerce=int)
-#     title = StringField('Title', validators=[DataRequired()])
-#     content = TextAreaField('Content', validators=[DataRequired()])
-#     submit = SubmitField('Submit')
