@@ -376,10 +376,10 @@ Insert into manages values (5, 5);
 
 /* Add buys to table */
 Insert into buys values (1, 'Blue pens 8-pack', 'BIC', '8x8x2', 24.99, 0, 1, 'You have bought Blue pens 8-pack', 1615978318, 1);
-Insert into buys values (2, 'Red pens 8-pack', 'BIC', '8x8x2', 24.99, 0, 2, 'You have bought Red pens 8-pack', strftime('%s', 'now'), 2);
-Insert into buys values (3, 'Bubblegum', 'Excel', '4x4x2', 9.99, 0, 3, 'You have bought Bubblegum', strftime('%s', 'now'), 3);
-Insert into buys values (4, 'Call of Duty - Modern Warfare', 'Activision', '6x62', 79.99, 0, 4, 'You have bought Call of Duty - Modern Warfare', strftime('%s', 'now'), 4);
-Insert into buys values (5, 'PS5', 'Sony', '20x20x20', 699.99, 0, 5, 'You have bought PS5', strftime('%s', 'now'), 5);
+Insert into buys values (2, 'Red pens 8-pack', 'BIC', '8x8x2', 24.99, 0, 2, 'You have bought Red pens 8-pack', 1612428228, 2);
+Insert into buys values (3, 'Bubblegum', 'Excel', '4x4x2', 9.99, 0, 3, 'You have bought Bubblegum', 1614217428, 3);
+Insert into buys values (4, 'Call of Duty - Modern Warfare', 'Activision', '6x62', 79.99, 0, 4, 'You have bought Call of Duty - Modern Warfare', 	1617295720, 4);
+Insert into buys values (5, 'PS5', 'Sony', '20x20x20', 699.99, 0, 5, 'You have bought PS5', 1617364120, 5);
 
 /* Add delivers to table */
 Insert into delivers values (1, 1, 1);
