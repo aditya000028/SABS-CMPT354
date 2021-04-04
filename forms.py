@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, RadioField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, RadioField, HiddenField
 from wtforms.validators import DataRequired, Length, Email, EqualTo
 
 
@@ -22,7 +22,10 @@ class LoginForm(FlaskForm):
 class TimeSelectForm(FlaskForm):
     timeInput = RadioField('Time Period', choices=[('All', 'All Orders'), ('SevenDays', '7 Days'), ('OneMonth', '1 Month')], default='All')
     submit = SubmitField('')
-    test = RadioField()
+
+class EditInformationForm(RegistrationForm):
+    submit_hidden = HiddenField('Hidden', id="hidden", default="test")
+    update = SubmitField('Update')
 
 
 # class BlogForm(FlaskForm):
