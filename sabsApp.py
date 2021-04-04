@@ -1,6 +1,6 @@
 from flask import Flask, render_template, url_for, flash, redirect, request, Response
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
-from forms import RegistrationForm, LoginForm, TimeSelectForm, EditInformationForm, SearchForm
+from forms import RegistrationForm, LoginForm, TimeSelectForm, EditInformationForm
 from classes.member import Member
 import datetime
 import time
