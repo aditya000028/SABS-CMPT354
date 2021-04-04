@@ -253,6 +253,16 @@ def searchResults():
 
     return render_template('searchResults.html', matching_items=matching_items, matching_items_images=matching_items_images, length=len(matching_items), title='Search results')
 
+@app.route("/cart", methods=['GET'])
+@login_required
+def cart():
+    conn = db_connection()
+    c = conn.cursor()
+    items_query = "SELECT item.itemName, item.price FROM cart, item WHERE cart.memberID = (?) AND cart.productID = item.itemID"
+    c.execute(items_query, str(current_user.id))
+    items = c.fetchall()
+    return render_template('cart.html', title = 'CART')
+
 
 if __name__ == '__main__':
     app.run(debug=True)
