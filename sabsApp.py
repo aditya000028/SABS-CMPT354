@@ -1,6 +1,6 @@
 from flask import Flask, render_template, url_for, flash, redirect, request, Response
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
-from forms import RegistrationForm, LoginForm, TimeSelectForm
+from forms import RegistrationForm, LoginForm, TimeSelectForm, EditInformationForm
 from classes.member import Member
 import datetime
 import time
@@ -83,15 +83,17 @@ def register():
 
     if registration_form.validate_on_submit():
         conn = db_connection()
-        c = conn.cursor
+        c = conn.cursor()
 
         points = 10
         currentdate = str(datetime.date.today())
         companyName = 'SABS General Store'
         
-        # Add the new blog into the 'member' table
+        # Create the query
         # Note: first value is NULL because sqlite automatically takes care of id
         query = "INSERT into member VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+
+        # Execute the query
         c.execute(query, (
             registration_form.firstName.data, 
             registration_form.lastName.data, 
@@ -100,8 +102,10 @@ def register():
             points, currentdate, companyName, 
             registration_form.address.data, 
             registration_form.birthdate.data
-            )) # Execute the query
-        conn.commit() # Commit the changes
+            )) 
+
+        # Commit the changes
+        conn.commit() 
 
         flash(f'Account created for {registration_form.firstName.data} {registration_form.lastName.data}!', 'success')
         return redirect(url_for('home'))
@@ -180,6 +184,55 @@ def logout():
 @login_required
 def customer_receipt():
     return render_template('customerReceipt.html', title='Customer Receipt')
+
+
+@app.route("/editInfo", methods=['GET', 'POST'])
+@login_required
+def editInfo():
+
+    # Get the user informaiton first to diplay in the form
+    conn = db_connection()
+    c = conn.cursor()
+
+    form = EditInformationForm()
+
+    get_info_query = "SELECT fname, lname, email, password, memberAddress, birthdate FROM member WHERE memberID = (?)"
+    c.execute(get_info_query, str(current_user.id))
+    member = c.fetchone()
+
+    if member is not None:
+        form.firstName.data = member["fname"]
+        form.lastName.data = member["lname"]
+        form.email.data = member["email"]
+        form.password.data = member["password"]
+        form.confirm_password.data = member["password"]
+        form.address.data = member["memberAddress"]
+        form.birthdate.data = member["birthdate"]
+    else:
+        flash(f'User does not exist in the database!', 'error')
+
+    if form.validate_on_submit and form.submit_hidden.data == "notHidden":
+
+        # Create the query
+        query = "UPDATE member SET fname = (?), lname = (?), email = (?), password = (?), memberAddress = (?), birthdate = (?)"
+
+        # Execute the query
+        c.execute(query, (
+            form.firstName.data, 
+            form.lastName.data, 
+            form.email.data, 
+            form.password.data,
+            form.address.data, 
+            form.birthdate.data
+            )) 
+
+        # Commit the changes
+        conn.commit() 
+        flash(f'Your information has been updated {form.firstName.data}!', 'success')
+        return(redirect(url_for('profile')))
+
+
+    return render_template('editInfo.html', form=form, title='Edit your Information')
 
 
 if __name__ == '__main__':
