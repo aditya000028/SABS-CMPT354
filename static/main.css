@@ -24,3 +24,32 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
 }
 
+.account-img {
+  height: 125px;
+  width: 125px;
+  margin-right: 20px;
+  margin-bottom: 16px;
+}
+
+.account-heading {
+  font-size: 2.5rem;
+}
+
+#itemname{
+  color: #444444;
+  text-decoration: none;
+}
+
+#productpicture {
+  max-height: 365px;
+  border: 10px solid #dddddd;
+  border-radius: 25px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+#price {
+  border: 5px solid #dddddd;
+  width: 50%;
+  margin-bottom: 10px;
+}
