@@ -251,7 +251,7 @@ def searchResults():
     matching_items = c.fetchall()
     matching_items_images = item_name_path(matching_items)
 
-    return render_template('searchResults.html', matching_items=matching_items, matching_items_images=matching_items_images, length=len(matching_items), title='Search results')
+    return render_template('searchResults.html', matching_items=matching_items, matching_items_images=matching_items_images, length=len(matching_items), search_query=str(temp), title='Search results')
 
 
 if __name__ == '__main__':
