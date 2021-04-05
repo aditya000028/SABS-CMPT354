@@ -1,4 +1,5 @@
 .vscode
 venv/
-__pycache__/
 .DS_Store
+classes\__pycache__
+__pycache__
