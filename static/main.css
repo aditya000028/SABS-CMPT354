@@ -42,6 +42,7 @@ h1, h2, h3, h4, h5, h6 {
 
 #productpicture {
   max-height: 365px;
+  max-width: 400px;
   border: 10px solid #dddddd;
   border-radius: 25px;
   text-align: center;

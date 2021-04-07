@@ -1,30 +1,44 @@
 {% extends "layout.html" %}
 {% block content %}
-    <div class="dropdown">
-      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        Sort by
-      </button>
-      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        <a class="dropdown-item" href="{{ url_for('home', sort_on='itemName') }}">Item Name</a>
-        <a class="dropdown-item" href="{{ url_for('home', sort_on='Brand Name') }}">Brand Name</a>
-        <a class="dropdown-item" href="{{ url_for('home', sort_on='stock') }}">Stock</a>
-        <a class="dropdown-item" href="{{ url_for('home', sort_on='price') }}">Price (asc)</a>
-        <a class="dropdown-item" href="{{ url_for('home', sort_on='size') }}">Size</a>
+<div class="row">
+    <div class="col-2">
+      <div class="content-section">
+        <h3>Our Sidebar</h3>
+        <p class='text-muted'>You can put any information here you'd like.
+          <ul class="list-group">
+            <li class="list-group-item list-group-item-light">Latest Posts</li>
+          </ul>
+        </p>
       </div>
     </div>
-    <div class="row p-2">
-      {% set sort_on = request.args.sort_on|default('itemName') %}
-      {% for x in items |sort(attribute=sort_on) %}
-        <div class="container-fluid media align-items-lg-center pt-5">
-          <img class="img-fluid w-50 ml-lg-5 order-1 or-lg-2" id="productpicture" src={{x.image}}>
-          <div class="media-body order-2 order-lg-1 pl-5">
-            <h2><a id="itemname" href="#">{{ x.itemName }}</a></h2>
-            <p id="itemprice"><b> {{ x.price }}</b></p>
-            <p><b>Brand:</b> {{ x.brand }}</p>
-            <p><b>Dimensions:</b> {{ x.size }}</p>
-            <p><b>In Stock:</b> {{ x.stock }}</p>
-          </div>
+    <div class="col-10">
+      <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Sort by
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          {% set sort_on = request.args.sort_on|default('itemName') %}
+          <a class="dropdown-item {{'active' if sort_on == 'itemName' }}" href="{{ url_for('home', sort_on='itemName') }}">Item Name</a>
+          <a class="dropdown-item {{'active' if sort_on == 'brand' }}" href="{{ url_for('home', sort_on='brand') }}">Brand Name</a>
+          <a class="dropdown-item {{'active' if sort_on == 'stock' }}" href="{{ url_for('home', sort_on='stock') }}">Stock</a>
+          <a class="dropdown-item {{'active' if sort_on == 'price' }}" href="{{ url_for('home', sort_on='price') }}">Price (asc)</a>
+          <a class="dropdown-item {{'active' if sort_on == 'size' }}" href="{{ url_for('home', sort_on='size') }}">Size</a>
         </div>
-      {% endfor %}
+      </div>
+      <div class="row p-2">
+        {% for x in items |sort(attribute=sort_on) %}
+          <div class="container-fluid media align-items-lg-center pt-5">
+            <img class="img-fluid w-50 ml-lg-5 order-1 or-lg-2" id="productpicture" src={{x.image}}>
+            <div class="media-body order-2 order-lg-1 pl-5">
+              <h2><a id="itemname" href="#">{{ x.itemName }}</a></h2>
+              <p id="itemprice"><b> {{ x.price }}</b></p>
+              <p><b>Brand:</b> {{ x.brand }}</p>
+              <p><b>Dimensions:</b> {{ x.size }}</p>
+              <p><b>In Stock:</b> {{ x.stock }}</p>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
     </div>
+</div>
 {% endblock content %}
