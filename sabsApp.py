@@ -89,7 +89,7 @@ def home():
         name = "../static/images/"
         name = name + str(x["itemName"]).replace(" ", "")
         name = name + ".png"
-        itemNamesList.append(name)
+        x['image'] = name
 
     return render_template('home.html', items=items, itemNamesList=itemNamesList, length=len(items))
 
