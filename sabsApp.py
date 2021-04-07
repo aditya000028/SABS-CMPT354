@@ -79,7 +79,7 @@ def home():
         name = name + ".png"
         x['image'] = name
 
-    return render_template('home.html', items=items, item_names_list=item_names_list, length=len(items))
+    return render_template('home.html', items=items, item_names_list=itemNamesList, length=len(items))
 
 
 @app.route("/register", methods=['GET', 'POST'])
