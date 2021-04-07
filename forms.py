@@ -28,9 +28,10 @@ class LoginForm(FlaskForm):
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
 
+class TimeSelectForm(FlaskForm):
+    timeInput = RadioField('Time Period', choices=[('All', 'All Orders'), ('SevenDays', '7 Days'), ('OneMonth', '1 Month')], default='All')
+    submit = SubmitField('')
 
-# class BlogForm(FlaskForm):
-#     username = SelectField('Username', choices=[], coerce=int)
-#     title = StringField('Title', validators=[DataRequired()])
-#     content = TextAreaField('Content', validators=[DataRequired()])
-#     submit = SubmitField('Submit')
+class EditInformationForm(RegistrationForm):
+    submit_hidden = HiddenField('Hidden', id="hidden", default="test")
+    update = SubmitField('Update')

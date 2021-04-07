@@ -1,6 +1,29 @@
 {% extends "layout.html" %}
 {% block content %}
-    <div class="content-section">
-        <h1>A test</h1>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h1>{{ current_user.fname }}'s Account</h1>
+                <hr>
+            </div> 
+        </div>
+        <div class="row">
+            <div class="col">
+                <a class="btn btn-outline-primary p-4" href="{{ url_for('pastPurchases') }}">
+                    <div class="row">
+                        <img class="img-fluid" width="50" height="50" style="float:left" src="../static/images/FullCart.png">
+                        Review past purchases
+                    </div>
+                </a>
+            </div>
+            <div class="col">
+                <a class="btn btn-outline-primary p-4" href="{{ url_for('editInfo') }}">
+                    <div class="row">
+                        <img class="img-fluid" width="50" height="50" style="float:left" src="../static/images/editInfo.png">
+                        Edit your information
+                    </div>
+                </a>
+            </div>
+        </div>
     </div>
-{% endblock %}
+{% endblock content %}

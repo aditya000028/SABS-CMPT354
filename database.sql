@@ -36,7 +36,7 @@ CREATE TABLE manager
     firstName varchar(255) NOT NULL,
     lastName varchar(255) NOT NULL,
     salary int NOT NULL,
-    CHECK(salary >= 60000 AND salary <= 120000)
+    CHECK(salary BETWEEN 60000 AND 120000)
 );
 
 CREATE TABLE employee
@@ -52,7 +52,7 @@ CREATE TABLE employee
     FOREIGN KEY (managerID) REFERENCES manager(managerID)
         ON DELETE SET DEFAULT
   		ON UPDATE CASCADE,
-    CHECK(wage >= 15.50 AND wage <= 40.50),
+    CHECK(wage BETWEEN 15.50 AND 40.50),
   	CHECK(managerID > 0)
 );
 
@@ -61,7 +61,9 @@ CREATE TRIGGER validate_startDate_before_insert_employee
 BEGIN 
 SELECT
 	CASE 
-    	WHEN NEW.startDate NOT LIKE '__-__-____' THEN RAISE(ABORT, 'Invalid start date')
+    	WHEN NEW.startDate NOT LIKE '____-__-__' THEN RAISE(ABORT, 'Invalid start date')
+      WHEN NEW.wage < 15.20 THEN RAISE(ABORT, 'Employee wage cannot be less than minimum wage!')
+      WHEN NEW.email NOT LIKE '%_@__%.__%' THEN RAISE (ABORT,'Invalid email address')
     END;
 END;
 
@@ -113,8 +115,8 @@ BEGIN
    SELECT
       CASE
 		WHEN NEW.email NOT LIKE '%_@__%.__%' THEN RAISE (ABORT,'Invalid email address')
-		WHEN NEW.birthdate NOT LIKE '__-__-____' THEN RAISE (ABORT,'Invalid birth date')
-        WHEN NEW.registeredDate NOT LIKE '__-__-____' THEN RAISE (ABORT,'Invalid registry date')
+		WHEN NEW.birthdate NOT LIKE '____-__-__' THEN RAISE (ABORT,'Invalid birth date')
+        WHEN NEW.registeredDate NOT LIKE '____-__-__' THEN RAISE (ABORT,'Invalid registry date')
       END;
 END;
 
@@ -132,7 +134,7 @@ CREATE TABLE item
     companyName varchar(255) NOT NULL,
   	CHECK(price > 0),
   	CHECK(stock >= 0),
-  	CHECK(discountpercent >= 0),
+  	CHECK(discountPercent >= 0),
     FOREIGN KEY(companyName) REFERENCES company(companyName)
   		on delete cascade
   		ON UPDATE CASCADE,
@@ -143,11 +145,12 @@ CREATE TABLE item
 
 CREATE TABLE cart
 ( 
-    cartID INTEGER NOT NULL,
+    productID INTEGER NOT NULL,
     memberID INTEGER NOT NULL,
-  	CHECK(cartID > 0),
+  	CHECK(productID > 0),
   	CHECK(memberID > 0),
-    FOREIGN KEY(memberID) REFERENCES member(memberID)
+    FOREIGN KEY(memberID) REFERENCES member(memberID),
+    FOREIGN KEY(productID) REFERENCES item(itemID)
   		on delete CASCADE
 );
 
@@ -171,7 +174,7 @@ CREATE TRIGGER startDate_validate_before_insert_empWorks
 BEGIN 
 SELECT
 	CASE 
-    	WHEN NEW.startDate NOT LIKE '__-__-____' THEN RAISE(ABORT, 'Invalid start date')
+    	WHEN NEW.startDate NOT LIKE '____-__-__' THEN RAISE(ABORT, 'Invalid start date')
     END;
 END;
 
@@ -198,7 +201,7 @@ CREATE TABLE review
   	CHECK(reviewnumber > 0),
   	CHECK(itemID > 0),
     CHECK(memberid > 0),
-    CHECK(rating >= 1 and rating <= 5),
+    CHECK(rating BETWEEN 1 AND 5),
     FOREIGN KEY(itemID) REFERENCES item(itemID)
         ON DELETE CASCADE,
     FOREIGN KEY(memberID) REFERENCES member(memberID)
@@ -222,16 +225,27 @@ CREATE TABLE manages
 CREATE TABLE buys
 (
     itemID INTEGER,
+    itemName varchar(255) NOT NULL,
+    brand varchar(255) NOT NULL,
+    size vachar(255),
+    price FLOAT NOT NULL,
+    discountPercent INTEGER NOT NULL,
     memberID INTEGER NOT NULL, 
     receipt text NOT NULL,
+    date_of_purchase INTEGER NOT NULL, 
     cartID INTEGER NOT NULL,
   	CHECK(itemID > 0),
     CHECK(memberID > 0),
     CHECK(cartID > 0),
+    CHECK(date_of_purchase > 0),
     FOREIGN KEY(itemID) REFERENCES item(itemID),
+    FOREIGN KEY(itemName) REFERENCES item(itemName),
+    FOREIGN KEY(brand) REFERENCES item(brand),
+    FOREIGN KEY(size) REFERENCES item(size),
+    FOREIGN KEY(price) REFERENCES item(price),
+    FOREIGN KEY(discountPercent) REFERENCES item(discountPercent),
     FOREIGN KEY(memberID) REFERENCES member(memberID),
     FOREIGN KEY(cartID) REFERENCES cart(cartID)
-  		on delete CASCADE
 );
 
 CREATE TABLE delivers
@@ -266,11 +280,11 @@ CREATE TABLE writes
 );
 
 /* Add members to database */
-Insert into member values (1, 'Bruce', 'Wayne', 'Batman@gmail.com', 'Batman', 0, '04-12-2021', 'SABS General Store', '1234 ABC place', '12-05-1950');
-Insert into member values (2, 'Peter', 'Parker', 'Spiderman@gmail.com', 'Spidey', 0, '07-12-2021', 'SABS General Store', '1234 ABC place', '12-05-1950');
-Insert into member values (3, 'Aubrey', 'Graham', 'Drake@gmail.com', 'Drake', 0, '24-11-1998', 'SABS General Store', '1234 ABC place', '12-05-1950');
-Insert into member values (4, 'Steph', 'Curry', 'splash@gmail.com', 'Chef', 0, '17-09-1987', 'SABS General Store', '1234 ABC place', '12-05-1950');
-Insert into member values (5, 'Elias', 'Pettersson', 'Petey@gmail.com', 'Petey', 0, '23-05-2001', 'SABS General Store', '1234 ABC place', '12-05-1950');
+Insert into member values (1, 'Bruce', 'Wayne', 'Batman@gmail.com', 'Batman', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', '1950-05-12');
+Insert into member values (2, 'Peter', 'Parker', 'Spiderman@gmail.com', 'Spidey', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', '1950-05-12');
+Insert into member values (3, 'Aubrey', 'Graham', 'Drake@gmail.com', 'Drake', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', '1950-05-12');
+Insert into member values (4, 'Steph', 'Curry', 'splash@gmail.com', 'Chef', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', '1950-05-12');
+Insert into member values (5, 'Elias', 'Pettersson', 'Petey@gmail.com', 'Petey', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', '1950-05-12');
 
 /* Add managers into table */
 Insert into manager values (1, 'TempFirst', 'TempLast', 60000);
@@ -291,11 +305,11 @@ Insert into store values (4, 'SABS General Store', 550000);
 Insert into store values (5, 'SABS General Store', 450000);
 
 /* Add employee to table */
-Insert into employee values (1, 20.50, 1, 'Emmanuel', 'Okafor', '12-12-1999', 'emmanuel@gmail.com', '1234');
-Insert into employee values (2, 20.50, 2, 'Dion', 'Sanders', '10-11-1998', 'dion@gmail.com', '1234');
-Insert into employee values (3, 20.50, 3, 'Ray', 'Allen', '12-12-1999', 'ray@gmail.com', '1234');
-Insert into employee values (4, 20.50, 4, 'Wayne', 'Gretzky', '12-12-1999', 'wayne@gmail.com', '1234');
-Insert into employee values (5, 20.50, 5, 'Brett', 'Hull', '12-12-1999', 'brett@gmail.com', '1234');
+Insert into employee values (1, 20.50, 1, 'Emmanuel', 'Okafor', '1999-12-12', 'emmanuel@gmail.com', '1234');
+Insert into employee values (2, 20.50, 2, 'Dion', 'Sanders', '1999-12-12', 'dion@gmail.com', '1234');
+Insert into employee values (3, 20.50, 3, 'Ray', 'Allen', '1999-12-12', 'ray@gmail.com', '1234');
+Insert into employee values (4, 20.50, 4, 'Wayne', 'Gretzky', '1999-12-12', 'wayne@gmail.com', '1234');
+Insert into employee values (5, 20.50, 5, 'Brett', 'Hull', '1999-12-12', 'brett@gmail.com', '1234');
 
 /* Add warehouse to table */
 Insert into warehouse values (1, '1234 Hoot St.');
@@ -310,28 +324,51 @@ Insert into department values ('Appliances');
 Insert into department values ('Electronics');
 Insert into department values ('Hardware');
 Insert into department values ('Stationery');
+Insert into department values ('Home');
 Insert into department values ('Miscellaneous');
 
 /* Add items to table */
-Insert into item(itemID, itemName, brand, size, price, stock, discountPercent, depName, companyName) values (1, 'Blue pens 8-pack', 'BIC', '8x8x2', 24.99, 10, 0, 'Stationery', 'SABS General Store');
-Insert into item(itemID, itemName, brand, size, price, stock, discountPercent, depName, companyName) values (2, 'Red pens 8-pack', 'BIC', '8x8x2', 24.99, 10, 0, 'Stationery', 'SABS General Store');
-Insert into item(itemID, itemName, brand, size, price, stock, discountPercent, depName, companyName) values (3, 'Bubblegum', 'Excel', '4x4x2', 9.99, 50, 0, 'Miscellaneous', 'SABS General Store');
-Insert into item(itemID, itemName, brand, size, price, stock, discountPercent, depName, companyName) values (4, 'Call of Duty - Modern Warfare', 'Activision', '6x62', 79.99, 5, 0, 'Electronics', 'SABS General Store');
-Insert into item(itemID, itemName, brand, size, price, stock, discountPercent, depName, companyName) values (5, 'PS5', 'Sony', '20x20x20', 699.99, 2, 0, 'Electronics', 'SABS General Store');
+Insert into item values (1, 'Blue pens 8-pack', 'BIC', '8x8x2', 24.99, 10, 0, 'Stationery', 'SABS General Store');
+Insert into item values (2, 'Red pens 8-pack', 'BIC', '8x8x2', 24.99, 10, 0, 'Stationery', 'SABS General Store');
+Insert into item values (3, 'Bubblegum', 'Excel', '4x4x2', 9.99, 50, 0, 'Miscellaneous', 'SABS General Store');
+Insert into item values (4, 'Call of Duty - Modern Warfare', 'Activision', '6x62', 79.99, 5, 0, 'Electronics', 'SABS General Store');
+Insert into item values (5, 'PS5', 'Sony', '20x20x20', 699.99, 2, 0, 'Electronics', 'SABS General Store');
+Insert into item values (6, 'Water Bottle', 'Kindle', '5x5x10', 10.99, 50, 0, 'Home', 'SABS General Store');
+Insert into item values (7, 'Hand Lotion', 'Glysomed', '2x2x7', 7.50, 100, 0, 'Home', 'SABS General Store');
+Insert into item values (8, 'Deodarant', 'Old Spice', '1x3x4', 5.99, 100, 10, 'Home', 'SABS General Store');
+Insert into item values (9, 'Pencil Sharpener', 'Burklin', '2x2x2', 2.99, 200, 0, 'Stationery', 'SABS General Store');
+Insert into item values (11, '60 inch flatscreen TV', 'Samsung', '30x10x30', 1999.99, 50, 0, 'Electronics', 'SABS General Store');
+Insert into item values (12, '35 inch monitor', 'Sony', '20x5x20', 699.99, 95, 15, 'Electronics', 'SABS General Store');
+Insert into item values (13, 'Airpods', 'Apple', '5x2x5', 249.99, 45, 0, 'Electronics', 'SABS General Store');
+Insert into item values (14, 'Body Spray - Aqua', 'Axe', '2x2x5', 2.99, 250, 0, 'Home', 'SABS General Store');
+Insert into item values (15, 'Hole Puncher', 'Burklin', '10x5x5', 9.99, 100, 12, 'Stationery', 'SABS General Store');
+Insert into item values (16, 'Ruler', 'Burklin', '1x10x1', 2.99, 200, 15, 'Stationery', 'SABS General Store');
+Insert into item values (17, 'Coffee Pot', 'HolyCoffee', '20x30x20', 250.00, 50, 50, 'Appliance', 'SABS General Store');
+Insert into item values (18, 'Hammer', 'Tougher', '2x15x5', 12.99, 75, 0, 'Hardware', 'SABS General Store');
+Insert into item values (19, 'Hockey Stick - Men Large', 'Bauer', '56x5x5', 94.99, 300, 0, 'Sporting', 'SABS General Store');
+Insert into item values (20, '20-pack Mini Bites', 'Entainment', '10x20x5', 15.99, 250, 0, 'Miscellaneous', 'SABS General Store');
+Insert into item values (21, 'Clipboard', 'Ready', '15x1x1', 5.99, 100, 0, 'Stationery', 'SABS General Store');
+Insert into item values (22, 'Dryer - Large Metallic', 'GG', '256x256x256', 1599.99, 25, 10, 'Appliances', 'SABS General Store');
+Insert into item values (23, 'Stove - Gas', 'GG', '300x300x300', 1899.99, 25, 10, 'Appliances', 'SABS General Store');
+Insert into item values (24, 'Professional Size Basketball', 'Wilson', '20x20x20', 20.99, 100, 0, 'Sporting', 'SABS General Store');
+Insert into item values (25, 'Basketball Air Pump', 'Sony', '5x10x20', 15.99, 65, 0, 'Sporting', 'SABS General Store');
 
 /* Add cart to table */
 Insert into cart values (1, 1);
 Insert into cart values (2, 2);
 Insert into cart values (3, 3);
 Insert into cart values (4, 4);
-Insert into cart values (5, 5);
+Insert into cart values (1, 5);
+Insert into cart values (1, 7);
+Insert into cart values (1, 8);
+Insert into cart values (5, 6);
 
 /* Add empWorks to table */
-Insert into empWorks values (1, 1, '12-12-2016');
-Insert into empWorks values (2, 2, '12-12-2017');
-Insert into empWorks values (3, 3, '12-12-2018');
-Insert into empWorks values (4, 4, '12-12-2019');
-Insert into empWorks values (5, 5, '12-12-2020');
+Insert into empWorks values (1, 1, '2016-12-12');
+Insert into empWorks values (2, 2, '2016-12-12');
+Insert into empWorks values (3, 3, '2016-12-12');
+Insert into empWorks values (4, 4, '2016-12-12');
+Insert into empWorks values (5, 5, '2016-12-12');
 
 /* Add storeHas to table */
 Insert into storeHas values (1, 'Sporting');
@@ -355,11 +392,30 @@ Insert into manages values (4, 4);
 Insert into manages values (5, 5);
 
 /* Add buys to table */
-Insert into buys values (1, 1, 'You have bought Blue pens 8-pack', 1);
-Insert into buys values (2, 2, 'You have bought Red pens 8-pack', 2);
-Insert into buys values (3, 3, 'You have bought Bubblegum', 3);
-Insert into buys values (4, 4, 'You have bought COD: Modern Warfare', 4);
-Insert into buys values (5, 5, 'You have bought PS5', 5);
+Insert into buys values (1, 'Blue pens 8-pack', 'BIC', '8x8x2', 24.99, 0, 1, 'You have bought "Blue pens 8-pack"', 1615978318, 1);
+Insert into buys values (2, 'Red pens 8-pack', 'BIC', '8x8x2', 24.99, 0, 2, 'You have bought "Red pens 8-pack"', 1612428228, 2);
+Insert into buys values (3, 'Bubblegum', 'Excel', '4x4x2', 9.99, 0, 3, 'You have bought "Bubblegum"', 1614217428, 3);
+Insert into buys values (4, 'Call of Duty - Modern Warfare', 'Activision', '6x62', 79.99, 0, 4, 'You have bought "Call of Duty - Modern Warfare"', 	1617295720, 4);
+Insert into buys values (5, 'PS5', 'Sony', '20x20x20', 699.99, 0, 5, 'You have bought PS5', 1617364120, 6);
+Insert into buys values (6, 'Water Bottle', 'Kindle', '5x5x10', 10.99, 0, 1, 'You have bought "Water Bottle"', 1615978318, 1);
+Insert into buys values (9, 'Pencil Sharpener', 'Burklin', '2x2x2', 2.99, 0, 1, 'You have bought "Pencil Sharpener"', 1615978318, 1);
+Insert into buys values (13, 'Airpods', 'Apple', '5x2x5', 249.99, 0, 1, 'You have bought "Airpods"', 1617364120, 5);
+Insert into buys values (14, 'Body Spray - Aqua', 'Axe', '2x2x5', 2.99, 0, 5, 'You have bought "Body Spray - Aqua"', 1617364120, 6);
+Insert into buys values (18, 'Hammer', 'Tougher', '2x15x5', 12.99, 0, 5, 'You have bought "Hammer"', 1617364120, 6);
+Insert into buys values (7, 'Hand Lotion', 'Glysomed', '2x2x7', 7.50, 0, 1, 'You have bought "Hand Lotion"', 1617364120, 5);
+Insert into buys values (6, 'Water Bottle', 'Kindle', '5x5x10', 10.99, 0, 1, 'You have bought "Water Bottle"', 1617364120, 5);
+Insert into buys values (17, 'Coffee Pot', 'HolyCoffee', '20x30x20', 250.00, 50, 1, 'You have bought "Coffee Pot"', 1617364120, 5);
+Insert into buys values (11, '60 inch flatscreen TV', 'Samsung', '30x10x30', 1999.99, 0, 1, 'You have bought "60 inch flatscreen TV"', 1617364120, 5);
+Insert into buys values (14, 'Body Spray - Aqua', 'Axe', '2x2x5', 2.99, 0, 1, 'You have bought "Body Spra - Aqua"', 1617354120, 7);
+Insert into buys values (6, 'Water Bottle', 'Kindle', '5x5x10', 10.99, 0, 1, 'You have bought "Water Bottle"', 1617354120, 7);
+Insert into buys values (15, 'Hole Puncher', 'Burklin', '10x5x5', 9.99, 12, 1, 'You have bought "Hole Puncher"', 1617154120, 8);
+Insert into buys values (12, '35 inch monitor', 'Sony', '20x5x20', 699.99, 15, 1, 'You have bought "35 inch monitor"', 1617154120, 8);
+Insert into buys values (9, 'Hockey Stick - Men Large', 'Bauer', '2x2x2', 2.99, 0, 1, 'You have bought "Hockey Stick - Men Large"', 1617154120, 8);
+Insert into buys values (9, 'Hockey Stick - Men Large', 'Bauer', '2x2x2', 2.99, 0, 1, 'You have bought "Hockey Stick - Men Large"', 1617154120, 8);
+Insert into buys values (13, 'Airpods', 'Apple', '5x2x5', 249.99, 0, 1, 'You have bought "Airpods"', 1617154120, 8);
+Insert into buys values (22, 'Dryer - Large Metallic', 'GG', '256x256x256', 1599.99, 10, 1, 'You have bought "Dryer - Large Metallic"', 1617154120, 8);
+Insert into buys values (23, 'Stove - Gas', 'GG', '300x300x300', 1899.99, 10, 1, 'You have bought "Stove - Gas"', 1617154120, 8);
+Insert into buys values (24, 'Professional Size Basketball', 'Wilson', '5x10x20', 15.99, 0, 1, 'You have bought "Professional Size Basketball"', 1617154120, 8);
 
 /* Add delivers to table */
 Insert into delivers values (1, 1, 1);
