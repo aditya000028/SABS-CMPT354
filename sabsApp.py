@@ -1,6 +1,6 @@
 from flask import Flask, render_template, url_for, flash, redirect, request, Response
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
-from forms import RegistrationForm, LoginForm, TimeSelectForm, EditInformationForm
+from forms import RegistrationForm, LoginForm, TimeSelectForm, EditInformationForm, AddForm
 from classes.member import Member
 import datetime
 import time
@@ -63,8 +63,7 @@ initialize_db()
 
 @app.route("/")
 @app.route("/home")
-def home():
-
+def home()
     conn = db_connection()
     c = conn.cursor()
     c.execute("SELECT * FROM item")

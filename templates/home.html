@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
+{% set sort_on = request.args.sort_on|default('itemName') %}
 <div class="row">
     <div class="col-2 p-2 border rounded">
       <div>
@@ -14,7 +15,7 @@
     <div>
         <h6 class="p-1 border-bottom">Filter By</h6>
         <div class="form-inline border rounded p-sm-2 my-2">
-          <input class="form-check-input" type="checkbox" id="instockcheck">
+            <input class="form-check-input" type="checkbox" id="instockcheck" disabled>
           <label class="form-check-label" for="instockcheck">In Stock Only</label>
         </div>
 
@@ -46,16 +47,15 @@
           Sort by
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-          {% set sort_on = request.args.sort_on|default('itemName') %}
           <a class="dropdown-item {{'active' if sort_on == 'itemName' }}" href="{{ url_for('home', sort_on='itemName') }}">Item Name</a>
           <a class="dropdown-item {{'active' if sort_on == 'brand' }}" href="{{ url_for('home', sort_on='brand') }}">Brand Name</a>
-          <a class="dropdown-item {{'active' if sort_on == 'stock' }}" href="{{ url_for('home', sort_on='stock') }}">Stock</a>
+          <a class="dropdown-item {{'active' if sort_on == 'stock' }}" href="{{ url_for('home', sort_on='stock') }}">Stock (asc)</a>
           <a class="dropdown-item {{'active' if sort_on == 'price' }}" href="{{ url_for('home', sort_on='price') }}">Price (asc)</a>
           <a class="dropdown-item {{'active' if sort_on == 'size' }}" href="{{ url_for('home', sort_on='size') }}">Size</a>
         </div>
       </div>
       <div class="row p-2">
-        {% for x in items |sort(attribute=sort_on) %}
+        {% for x in items | sort(attribute=sort_on) %}
           <div class="container-fluid media align-items-lg-center pt-5">
             <img class="img-fluid w-50 ml-lg-5 order-1 or-lg-2" id="productpicture" src={{x.image}}>
             <div class="media-body order-2 order-lg-1 pl-5">
