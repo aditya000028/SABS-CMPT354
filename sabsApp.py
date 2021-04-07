@@ -127,11 +127,11 @@ def login():
     if form.validate_on_submit():
         conn = db_connection()
         c = conn.cursor()
-        c.execute("SELECT * FROM members")
+        c.execute("SELECT * FROM member")
         row = c.fetchone()
         if row is not None:
             if row["email"] == form.email.data and row["password"] == form.password.data:
-                valid_member = load_member(row["id"])
+                valid_member = load_member(row["memberID"])
                 login_user(valid_member, remember=form.remember.data)
                 flash(f'Login successful for {row["fname"]} {row["lname"]}!', 'success')
                 return redirect(url_for('home'))
