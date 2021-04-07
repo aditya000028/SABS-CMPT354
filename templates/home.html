@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
 {% set sort_on = request.args.sort_on|default('itemName') %}
+{% set brand = request.args.brand|default(null) %}
 <div class="row">
     <div class="col-2 p-2 border rounded">
       <div>
@@ -24,7 +25,7 @@
         </p>
         <div id="brandsgroup" class="collapse">
           <ul class="list-group">
-            <li class="list-group-item list-group-item-action mb-2 rounded"><a href="#"> brandname</a></li>
+            <li class="list-group-item list-group-item-action mb-2 rounded"><a href="{{ url_for('home', sort_on=sort_on, brand='BIC')}}"> BIC </a></li>
             <li class="list-group-item list-group-item-action mb-2 rounded"><a href="#"> brandname </a></li>
             <li class="list-group-item list-group-item-action mb-2 rounded"><a href="#"> brandname</a></li>
         </ul>
@@ -47,11 +48,11 @@
           Sort by
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-          <a class="dropdown-item {{'active' if sort_on == 'itemName' }}" href="{{ url_for('home', sort_on='itemName') }}">Item Name</a>
-          <a class="dropdown-item {{'active' if sort_on == 'brand' }}" href="{{ url_for('home', sort_on='brand') }}">Brand Name</a>
-          <a class="dropdown-item {{'active' if sort_on == 'stock' }}" href="{{ url_for('home', sort_on='stock') }}">Stock (asc)</a>
-          <a class="dropdown-item {{'active' if sort_on == 'price' }}" href="{{ url_for('home', sort_on='price') }}">Price (asc)</a>
-          <a class="dropdown-item {{'active' if sort_on == 'size' }}" href="{{ url_for('home', sort_on='size') }}">Size</a>
+          <a class="dropdown-item {{'active' if sort_on == 'itemName' }}" href="{{ url_for('home', sort_on='itemName', brand=brand) }}">Item Name</a>
+          <a class="dropdown-item {{'active' if sort_on == 'brand' }}" href="{{ url_for('home', sort_on='brand', brand=brand) }}">Brand Name</a>
+          <a class="dropdown-item {{'active' if sort_on == 'stock' }}" href="{{ url_for('home', sort_on='stock', brand=brand) }}">Stock (asc)</a>
+          <a class="dropdown-item {{'active' if sort_on == 'price' }}" href="{{ url_for('home', sort_on='price', brand=brand) }}">Price (asc)</a>
+          <a class="dropdown-item {{'active' if sort_on == 'size' }}" href="{{ url_for('home', sort_on='size', brand=brand) }}">Size</a>
         </div>
       </div>
       <div class="row p-2">
