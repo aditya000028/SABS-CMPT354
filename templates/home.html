@@ -1,15 +1,44 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="row">
-    <div class="col-2">
-      <div class="content-section">
-        <h3>Our Sidebar</h3>
-        <p class='text-muted'>You can put any information here you'd like.
-          <ul class="list-group">
-            <li class="list-group-item list-group-item-light">Latest Posts</li>
-          </ul>
+    <div class="col-2 p-2 border rounded">
+      <div>
+        <h6 class="p-1 border-bottom">Department</h6>
+        <ul>
+            <li><a href="#">Meat</a></li>
+            <li><a href="#">Bread</a></li>
+            <li><a href="#">Stuff</a></li>
+            <li><a href="#">MoreStuff</a></li>
+        </ul>
+    </div>
+    <div>
+        <h6 class="p-1 border-bottom">Filter By</h6>
+        <div class="form-inline border rounded p-sm-2 my-2">
+          <input class="form-check-input" type="checkbox" id="instockcheck">
+          <label class="form-check-label" for="instockcheck">In Stock Only</label>
+        </div>
+
+        <p>
+          <a data-toggle="collapse" href="#brandsgroup">Brand</a>
         </p>
-      </div>
+        <div id="brandsgroup" class="collapse">
+          <ul class="list-group">
+            <li class="list-group-item list-group-item-action mb-2 rounded"><a href="#"> brandname</a></li>
+            <li class="list-group-item list-group-item-action mb-2 rounded"><a href="#"> brandname </a></li>
+            <li class="list-group-item list-group-item-action mb-2 rounded"><a href="#"> brandname</a></li>
+        </ul>
+        </div>
+        <p>
+          <a data-toggle="collapse" href="#sizesgroup">Size</a>
+        </p>
+        <div id="sizesgroup" class="collapse">
+          <ul class="list-group">
+            <li class="list-group-item list-group-item-action mb-2 rounded"><a href="#"> big</a></li>
+            <li class="list-group-item list-group-item-action mb-2 rounded"><a href="#"> medium </a></li>
+            <li class="list-group-item list-group-item-action mb-2 rounded"><a href="#"> small</a></li>
+        </ul>
+        </div>
+    </div>
     </div>
     <div class="col-10">
       <div class="dropdown">
