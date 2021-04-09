@@ -10,6 +10,7 @@
             <p class="article-content"><b>Brand:</b>{{ items[x].brand }}</p>
             <p class="article-content"><b>Dimensions:</b>{{ items[x].size }}</p>
             <p class="article-content"><b>In Stock:</b>{{ items[x].stock }}</p>
+	    <a href='{{ url_for("show", itemID=items[x].itemID) }}'>Product Description</a>
             <img src={{item_names_list[x]}} style="width:50%;height:auto;">
           </div>
         <article>

@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h2><a class="article-title" href="#">{{ item.itemID }}</a></h2>
+    <p class="article-content" id="price"><b>{{ item.price }}</b></p>
+    <p class="article-content"><b>Brand:</b>{{ item.brand }}</p>
+    <p class="article-content"><b>Dimensions:</b>{{ item.size }}</p>
+    <p class="article-content"><b>In Stock:</b>{{ item.stock }}</p>
+    </div>
+        
+{% endblock content %}

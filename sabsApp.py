@@ -5,6 +5,7 @@ from classes.member import Member
 import datetime
 import time
 import sqlite3
+from flask import request
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
@@ -134,6 +135,8 @@ def login():
 
     return render_template('login.html', title='Login', form=form)
 
+
+
 @app.route("/profile/pastPurchases", methods=['GET', 'POST'])
 @login_required
 def pastPurchases():
@@ -253,6 +256,19 @@ def searchResults():
 
     return render_template('searchResults.html', matching_items=matching_items, matching_items_images=matching_items_images, length=len(matching_items), title='Search results')
 
+@app.route("/ProductDescription")
+def show():
+    item_ID = request.args.get('itemID')
+    conn = db_connection()
+    c = conn.cursor()
+    temp = str(item_ID)
+    query = "SELECT * FROM item WHERE itemID LIKE (?)"
+    c.execute(query, (temp,))
+    item = c.fetchall()
+    return render_template('ProductDescription.html', item =item)
+
+
+
 @app.route("/cart", methods=['GET'])
 @login_required
 def cart():
@@ -260,8 +276,8 @@ def cart():
     c = conn.cursor()
     items_query = "SELECT item.itemName, item.price FROM cart, item WHERE cart.memberID = (?) AND cart.productID = item.itemID"
     c.execute(items_query, str(current_user.id))
-    items = c.fetchall()
-    return render_template('cart.html', title = 'CART')
+    items = c.fetchone()
+    return render_template('cart.html', items = items, length = len(items), title = 'cart')
 
 
 if __name__ == '__main__':
