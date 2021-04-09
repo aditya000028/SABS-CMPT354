@@ -145,11 +145,12 @@ CREATE TABLE item
 
 CREATE TABLE cart
 ( 
-    cartID INTEGER NOT NULL,
+    productID INTEGER NOT NULL,
     memberID INTEGER NOT NULL,
-  	CHECK(cartID > 0),
+  	CHECK(productID > 0),
   	CHECK(memberID > 0),
-    FOREIGN KEY(memberID) REFERENCES member(memberID)
+    FOREIGN KEY(memberID) REFERENCES member(memberID),
+    FOREIGN KEY(productID) REFERENCES item(itemID)
   		on delete CASCADE
 );
 
