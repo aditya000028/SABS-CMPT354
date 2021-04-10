@@ -77,7 +77,7 @@ def home():
     return render_template('home.html', items=items, item_names_list=item_names_list, length=len(items))
 
 
-@app.route("/register", methods=['GET', 'POST'])
+@app.route("/register", methods=['GET'])
 def register():
 
     registration_form = RegistrationForm()
@@ -256,16 +256,15 @@ def searchResults():
 
     return render_template('searchResults.html', matching_items=matching_items, matching_items_images=matching_items_images, length=len(matching_items), title='Search results')
 
-@app.route("/ProductDescription")
-def show():
-    item_ID = request.args.get('itemID')
+@app.route("/ProductDescription/<int:itemID>")
+def show(itemID):
     conn = db_connection()
     c = conn.cursor()
-    temp = str(item_ID)
-    query = "SELECT * FROM item WHERE itemID LIKE (?)"
-    c.execute(query, (temp,))
-    item = c.fetchall()
-    return render_template('ProductDescription.html', item =item)
+    temp = str(itemID)
+    query = "SELECT * FROM item WHERE itemID = (?)"
+    c.execute(query, temp)
+    item = c.fetchone()
+    return render_template('ProductDescription.html', item =item, title = 'Description' )
 
 
 
@@ -274,7 +273,7 @@ def show():
 def cart():
     conn = db_connection()
     c = conn.cursor()
-    items_query = "SELECT item.itemName, item.price FROM cart, item WHERE cart.memberID = (?) AND cart.productID = item.itemID"
+    items_query = "SELECT * FROM objects WHERE obj_cart_id = (?) "
     c.execute(items_query, str(current_user.id))
     items = c.fetchone()
     return render_template('cart.html', items = items, length = len(items), title = 'cart')
