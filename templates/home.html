@@ -65,7 +65,7 @@
               <p><b>Brand:</b> {{ x.brand }}</p>
               <p><b>Dimensions:</b> {{ x.size }}</p>
               <p><b>In Stock:</b> {{ x.stock }}</p>
-              <a href='{{ url_for("show", itemID=items[x].itemID) }}'>Product Description</a>
+              <a href='{{ url_for("show", itemID=x.itemID) }}'>Product Description</a>
             </div>
           </div>
         {% endfor %}
