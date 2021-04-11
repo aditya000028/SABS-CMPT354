@@ -1,6 +1,6 @@
 from flask import Flask, render_template, url_for, flash, redirect, request, Response
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
-from forms import RegistrationForm, LoginForm, TimeSelectForm, EditInformationForm
+from forms import RegistrationForm, LoginForm, TimeSelectForm, EditInformationForm, AddForm
 from classes.member import Member
 import datetime
 import time
@@ -21,7 +21,7 @@ def load_member(member_id):
     row = cursor.fetchone()
     if row is None:
         return None
-    else:        
+    else:
         return Member(int(row[0]), row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9])
 
 
@@ -65,16 +65,25 @@ initialize_db()
 @app.route("/")
 @app.route("/home")
 def home():
-    
+    query = "SELECT * FROM item"
+    if ('brand' in request.args and  request.args.get('brand', type=str) != ""):
+        query = "SELECT * FROM item WHERE brand=\"" + request.args.get('brand', type=str) + '\"'
+
     conn = db_connection()
     c = conn.cursor()
-    c.execute("SELECT * FROM item")
-    
+    c.execute(query)
+
     items = c.fetchall()
 
-    item_names_list = item_name_path(items)
+    # Create the path to display item images
+    itemNamesList = []
+    for x in items:
+        name = "../static/images/"
+        name = name + str(x["itemName"]).replace(" ", "")
+        name = name + ".png"
+        x['image'] = name
 
-    return render_template('home.html', items=items, item_names_list=item_names_list, length=len(items))
+    return render_template('home.html', items=items, item_names_list=itemNamesList, length=len(items))
 
 
 @app.route("/register", methods=['GET'])
@@ -89,24 +98,24 @@ def register():
         points = 10
         currentdate = str(datetime.date.today())
         companyName = 'SABS General Store'
-        
+
         # Create the query
         # Note: first value is NULL because sqlite automatically takes care of id
         query = "INSERT into member VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
         # Execute the query
         c.execute(query, (
-            registration_form.firstName.data, 
-            registration_form.lastName.data, 
-            registration_form.email.data, 
-            registration_form.password.data, 
-            points, currentdate, companyName, 
-            registration_form.address.data, 
+            registration_form.firstName.data,
+            registration_form.lastName.data,
+            registration_form.email.data,
+            registration_form.password.data,
+            points, currentdate, companyName,
+            registration_form.address.data,
             registration_form.birthdate.data
-            )) 
+            ))
 
         # Commit the changes
-        conn.commit() 
+        conn.commit()
 
         flash(f'Account created for {registration_form.firstName.data} {registration_form.lastName.data}!', 'success')
         return redirect(url_for('home'))
@@ -117,16 +126,16 @@ def register():
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('profile'))
-    
+
     form = LoginForm()
     if form.validate_on_submit():
         conn = db_connection()
         c = conn.cursor()
-        c.execute("SELECT * FROM members")
+        c.execute("SELECT * FROM member")
         row = c.fetchone()
         if row is not None:
             if row["email"] == form.email.data and row["password"] == form.password.data:
-                valid_member = load_member(row["id"])
+                valid_member = load_member(row["memberID"])
                 login_user(valid_member, remember=form.remember.data)
                 flash(f'Login successful for {row["fname"]} {row["lname"]}!', 'success')
                 return redirect(url_for('home'))
@@ -148,7 +157,7 @@ def pastPurchases():
     form = TimeSelectForm()
 
     if form.validate_on_submit:
-        current_time = int(time.time())          
+        current_time = int(time.time())
 
         if form.timeInput.data == "All":
             items_query = "SELECT * FROM buys WHERE memberID = (?)"
@@ -223,16 +232,16 @@ def editInfo():
 
         # Execute the query
         c.execute(query, (
-            form.firstName.data, 
-            form.lastName.data, 
-            form.email.data, 
+            form.firstName.data,
+            form.lastName.data,
+            form.email.data,
             form.password.data,
-            form.address.data, 
+            form.address.data,
             form.birthdate.data
-            )) 
+            ))
 
         # Commit the changes
-        conn.commit() 
+        conn.commit()
         flash(f'Your information has been updated {form.firstName.data}!', 'success')
         return(redirect(url_for('profile')))
 
@@ -241,7 +250,7 @@ def editInfo():
 
 @app.route('/searchResults')
 def searchResults():
-    
+
     user_query = "%"
     temp = request.args.get("q")
     user_query = user_query + str(temp) + "%"
@@ -279,6 +288,25 @@ def cart():
     print(items)
     return render_template('cart.html', items = items, length = len(items), title = 'cart')
 
+
+@app.route("/add", methods=['GET', 'POST'])
+def add():
+    form = AddForm()
+
+    if form.validate_on_submit():
+        conn = sqlite3.connect('sabs.db')
+        c = conn.cursor()
+
+        try:
+            query = "Insert into items(itemid, itemName, brand, size, price, stock) VALUES (?, ?, ?, ?, ?, ?)"
+            c.execute(query, (form.itemid.data, form.itemName.data, form.brand.data, form.size.data, form.price.data, form.stock.data)) #Execute the query
+            conn.commit() #Commit the changes
+            flash(f'{form.itemName.data} added to database with the ID of {form.itemid.data}!', 'success')
+            return redirect(url_for('home'))
+        except:
+            flash(f'{form.itemName.data} failed to be added to the DB!', 'danger')
+
+    return render_template('add.html', title='Add', form=form)
 
 if __name__ == '__main__':
     app.run(debug=True)
