@@ -268,14 +268,15 @@ def show(itemID):
 
 
 
-@app.route("/cart", methods=['GET'])
+@app.route("/cart")
 @login_required
 def cart():
     conn = db_connection()
     c = conn.cursor()
-    items_query = "SELECT * FROM objects WHERE obj_cart_id = (?) "
+    items_query = "SELECT * FROM cart WHERE cartID = (?)"
     c.execute(items_query, str(current_user.id))
     items = c.fetchone()
+    print(items)
     return render_template('cart.html', items = items, length = len(items), title = 'cart')
 
 

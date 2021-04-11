@@ -147,24 +147,15 @@ CREATE TABLE item
 CREATE TABLE cart
 ( 
     cartID INTEGER NOT NULL,
+    objectID INTEGER NOT NULL,
+    objectName varchar(255),
   	CHECK(cartID > 0),
-    FOREIGN KEY(cartID) REFERENCES member(memberID)
+    FOREIGN KEY(cartID) REFERENCES member(memberID),
+    FOREIGN KEY(objectID) REFERENCES item(itemID),
+    FOREIGN KEY(objectName) REFERENCES item(itemName)
   		on delete CASCADE
 );
 
-
-CREATE TABLE objects
-(
-    obj_cart_id INTEGER NOT NULL,
-    obj_item_id INTEGER NOT NULL,
-    obj_item_name varchar(255) NOT NULL,
-    obj_item_price varchar(255) NOT NULL,
-
-    FOREIGN KEY(obj_cart_id) REFERENCES cart(cartID),
-    FOREIGN KEY(obj_item_id) REFERENCES item(itemID),
-    FOREIGN KEY(obj_item_name) REFERENCES item(itemName),
-    FOREIGN KEY(obj_item_price) REFERENCES item(price)
-);
 
 CREATE TABLE empWorks
 (
@@ -365,15 +356,9 @@ Insert into item values (23, 'Stove - Gas', 'GG', '300x300x300', 1899.99, 25, 10
 Insert into item values (24, 'Professional Size Basketball', 'Wilson', '20x20x20', 20.99, 100, 0, 'Sporting', 'SABS General Store');
 Insert into item values (25, 'Basketball Air Pump', 'Sony', '5x10x20', 15.99, 65, 0, 'Sporting', 'SABS General Store');
 
-
-Insert into objects values (1,25,'Basketball Air Pump',15.99);
-
 /* Add cart to table */
-Insert into cart values (1);
-Insert into cart values (2);
-Insert into cart values (3);
-Insert into cart values (4);
-
+Insert into cart values (1, 25, 'Basketball Air Pump');
+Insert into cart values(1, 9, 'Pencil Sharpener');
 
 /* Add empWorks to table */
 Insert into empWorks values (1, 1, '2016-12-12');
