@@ -284,7 +284,7 @@ def cart():
     c = conn.cursor()
     items_query = "SELECT * FROM cart WHERE cartID = (?)"
     c.execute(items_query, str(current_user.id))
-    items = c.fetchone()
+    items = c.fetchall()
     print(items)
     return render_template('cart.html', items = items, length = len(items), title = 'cart')
 

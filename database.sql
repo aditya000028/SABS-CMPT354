@@ -149,10 +149,12 @@ CREATE TABLE cart
     cartID INTEGER NOT NULL,
     objectID INTEGER NOT NULL,
     objectName varchar(255),
+    objectPrice float NOT NULL,
   	CHECK(cartID > 0),
     FOREIGN KEY(cartID) REFERENCES member(memberID),
     FOREIGN KEY(objectID) REFERENCES item(itemID),
-    FOREIGN KEY(objectName) REFERENCES item(itemName)
+    FOREIGN KEY(objectName) REFERENCES item(itemName),
+    FOREIGN KEY(objectPrice) REFERENCES item(price)
   		on delete CASCADE
 );
 
@@ -357,8 +359,8 @@ Insert into item values (24, 'Professional Size Basketball', 'Wilson', '20x20x20
 Insert into item values (25, 'Basketball Air Pump', 'Sony', '5x10x20', 15.99, 65, 0, 'Sporting', 'SABS General Store');
 
 /* Add cart to table */
-Insert into cart values (1, 25, 'Basketball Air Pump');
-Insert into cart values(1, 9, 'Pencil Sharpener');
+Insert into cart values (1, 25, 'Basketball Air Pump', 15.99);
+Insert into cart values(1, 9, 'Pencil Sharpener', 2.99);
 
 /* Add empWorks to table */
 Insert into empWorks values (1, 1, '2016-12-12');
