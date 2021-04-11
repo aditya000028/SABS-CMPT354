@@ -5,6 +5,7 @@ from classes.member import Member
 import datetime
 import time
 import sqlite3
+from flask import request
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
@@ -85,7 +86,7 @@ def home():
     return render_template('home.html', items=items, item_names_list=itemNamesList, length=len(items))
 
 
-@app.route("/register", methods=['GET', 'POST'])
+@app.route("/register", methods=['GET'])
 def register():
 
     registration_form = RegistrationForm()
@@ -142,6 +143,8 @@ def login():
                 flash(f'Incorrect email or password', 'error')
 
     return render_template('login.html', title='Login', form=form)
+
+
 
 @app.route("/profile/pastPurchases", methods=['GET', 'POST'])
 @login_required
@@ -262,15 +265,28 @@ def searchResults():
 
     return render_template('searchResults.html', matching_items=matching_items, matching_items_images=matching_items_images, length=len(matching_items), title='Search results')
 
-@app.route("/cart", methods=['GET'])
+@app.route("/ProductDescription/<int:itemID>")
+def show(itemID):
+    conn = db_connection()
+    c = conn.cursor()
+    temp = str(itemID)
+    query = "SELECT * FROM item WHERE itemID = (?)"
+    c.execute(query, temp)
+    item = c.fetchone()
+    return render_template('ProductDescription.html', item =item, title = 'Description' )
+
+
+
+@app.route("/cart")
 @login_required
 def cart():
     conn = db_connection()
     c = conn.cursor()
-    items_query = "SELECT item.itemName, item.price FROM cart, item WHERE cart.memberID = (?) AND cart.productID = item.itemID"
+    items_query = "SELECT * FROM cart WHERE cartID = (?)"
     c.execute(items_query, str(current_user.id))
-    items = c.fetchall()
-    return render_template('cart.html', title = 'CART')
+    items = c.fetchone()
+    print(items)
+    return render_template('cart.html', items = items, length = len(items), title = 'cart')
 
 
 @app.route("/add", methods=['GET', 'POST'])

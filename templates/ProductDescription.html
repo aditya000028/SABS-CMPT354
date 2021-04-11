@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block content %}
+        <article class="media">
+          <div class="media-body">
+            <div class="article-metadata">
+            <div class="rectangle"></div>
+            <h2><a class="article-title" href="#">{{ item.itemName }}</a></h2>
+            <p class="article-content" id="price"><b>{{ item.price }}</b></p>
+            <p class="article-content"><b>Brand:</b>{{ item.brand }}</p>
+            <p class="article-content"><b>Dimensions:</b>{{ item.size }}</p>
+            <p class="article-content"><b>In Stock:</b>{{ item.stock }}</p>
+          </div>
+        <article>
+{% endblock content %}

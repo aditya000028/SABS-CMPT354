@@ -29,6 +29,7 @@ drop table if exists empWorks;
 drop table if exists storeHas;
 drop table if exists department;
 drop table if exists cart;
+drop table if exists objects;
 
 CREATE TABLE manager 
 (
@@ -145,14 +146,16 @@ CREATE TABLE item
 
 CREATE TABLE cart
 ( 
-    productID INTEGER NOT NULL,
-    memberID INTEGER NOT NULL,
-  	CHECK(productID > 0),
-  	CHECK(memberID > 0),
-    FOREIGN KEY(memberID) REFERENCES member(memberID),
-    FOREIGN KEY(productID) REFERENCES item(itemID)
+    cartID INTEGER NOT NULL,
+    objectID INTEGER NOT NULL,
+    objectName varchar(255),
+  	CHECK(cartID > 0),
+    FOREIGN KEY(cartID) REFERENCES member(memberID),
+    FOREIGN KEY(objectID) REFERENCES item(itemID),
+    FOREIGN KEY(objectName) REFERENCES item(itemName)
   		on delete CASCADE
 );
+
 
 CREATE TABLE empWorks
 (
@@ -354,14 +357,8 @@ Insert into item values (24, 'Professional Size Basketball', 'Wilson', '20x20x20
 Insert into item values (25, 'Basketball Air Pump', 'Sony', '5x10x20', 15.99, 65, 0, 'Sporting', 'SABS General Store');
 
 /* Add cart to table */
-Insert into cart values (1, 1);
-Insert into cart values (2, 2);
-Insert into cart values (3, 3);
-Insert into cart values (4, 4);
-Insert into cart values (1, 5);
-Insert into cart values (1, 7);
-Insert into cart values (1, 8);
-Insert into cart values (5, 6);
+Insert into cart values (1, 25, 'Basketball Air Pump');
+Insert into cart values(1, 9, 'Pencil Sharpener');
 
 /* Add empWorks to table */
 Insert into empWorks values (1, 1, '2016-12-12');
