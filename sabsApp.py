@@ -285,8 +285,24 @@ def cart():
     items_query = "SELECT * FROM cart WHERE cartID = (?)"
     c.execute(items_query, str(current_user.id))
     items = c.fetchall()
-    print(items)
     return render_template('cart.html', items = items, length = len(items), title = 'cart')
+
+
+@app.route('/cart/<int:itemID>')
+@login_required
+def add_to_cart(itemID):
+    conn = db_connection()
+    c = conn.cursor()
+    temp = str(itemID)
+    query = "SELECT * FROM item WHERE itemID = (?)"
+    c.execute(query, temp)
+    item = c.fetchone()
+
+    query2 = "INSERT into cart VALUES (?, ?, ?, ?)"
+    c.execute(query2,(current_user.id,item['itemID'], item['itemName'], item['price']))
+    conn.commit()
+    return redirect(url_for('cart'))
+    
 
 
 @app.route("/add", methods=['GET', 'POST'])
