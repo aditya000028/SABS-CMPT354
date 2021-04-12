@@ -285,7 +285,12 @@ def cart():
     items_query = "SELECT * FROM cart WHERE cartID = (?)"
     c.execute(items_query, str(current_user.id))
     items = c.fetchall()
-    return render_template('cart.html', items = items, length = len(items), title = 'cart')
+
+    sum = 0
+    for x in items:
+        sum = sum + x['objectPrice'] 
+ 
+    return render_template('cart.html', items = items, length = len(items), total = sum, title = 'cart')
 
 
 @app.route('/cart/<int:itemID>')
