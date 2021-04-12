@@ -265,13 +265,13 @@ def searchResults():
 
     return render_template('searchResults.html', matching_items=matching_items, matching_items_images=matching_items_images, length=len(matching_items), title='Search results')
 
-@app.route("/ProductDescription/<int:itemID>")
+@app.route("/ProductDescription/<itemID>")
 def show(itemID):
     conn = db_connection()
     c = conn.cursor()
     temp = str(itemID)
     query = "SELECT * FROM item WHERE itemID = (?)"
-    c.execute(query, temp)
+    c.execute(query, (temp,))
     item = c.fetchone()
     return render_template('ProductDescription.html', item =item, title = 'Description' )
 
@@ -295,7 +295,7 @@ def add_to_cart(itemID):
     c = conn.cursor()
     temp = str(itemID)
     query = "SELECT * FROM item WHERE itemID = (?)"
-    c.execute(query, temp)
+    c.execute(query, (temp,))
     item = c.fetchone()
 
     query2 = "INSERT into cart VALUES (?, ?, ?, ?)"
