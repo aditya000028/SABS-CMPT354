@@ -76,14 +76,13 @@ def home():
     items = c.fetchall()
 
     # Create the path to display item images
-    itemNamesList = []
     for x in items:
         name = "../static/images/"
         name = name + str(x["itemName"]).replace(" ", "")
         name = name + ".png"
         x['image'] = name
 
-    return render_template('home.html', items=items, item_names_list=itemNamesList, length=len(items))
+    return render_template('home.html', items=items)
 
 
 @app.route("/register", methods=['GET'])
@@ -270,7 +269,7 @@ def searchResults():
         x['image'] = name
 
 
-    return render_template('searchResults.html', items=items, matching_items_images=matching_items_images, length=len(items), title='Search results')
+    return render_template('searchResults.html', items=items, title='Search results')
 
 @app.route("/ProductDescription/<itemID>")
 def show(itemID):
