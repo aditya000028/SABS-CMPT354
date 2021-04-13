@@ -260,10 +260,17 @@ def searchResults():
     query = "SELECT * FROM item WHERE itemName LIKE (?)"
     c.execute(query, [user_query])
 
-    matching_items = c.fetchall()
-    matching_items_images = item_name_path(matching_items)
+    items = c.fetchall()
+    # Create the path to display item images
+    matching_items_images = []
+    for x in items:
+        name = "../static/images/"
+        name = name + str(x["itemName"]).replace(" ", "")
+        name = name + ".png"
+        x['image'] = name
 
-    return render_template('searchResults.html', matching_items=matching_items, matching_items_images=matching_items_images, length=len(matching_items), title='Search results')
+
+    return render_template('searchResults.html', items=items, matching_items_images=matching_items_images, length=len(items), title='Search results')
 
 @app.route("/ProductDescription/<itemID>")
 def show(itemID):
@@ -288,8 +295,8 @@ def cart():
 
     sum = 0
     for x in items:
-        sum = sum + x['objectPrice'] 
- 
+        sum = sum + x['objectPrice']
+
     return render_template('cart.html', items = items, length = len(items), total = sum, title = 'cart')
 
 
@@ -307,7 +314,7 @@ def add_to_cart(itemID):
     c.execute(query2,(current_user.id,item['itemID'], item['itemName'], item['price']))
     conn.commit()
     return redirect(url_for('cart'))
-    
+
 
 
 @app.route("/add", methods=['GET', 'POST'])
