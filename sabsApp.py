@@ -1,17 +1,19 @@
 from flask import Flask, render_template, url_for, flash, redirect, request, Response
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
-from forms import RegistrationForm, LoginForm, TimeSelectForm, EditInformationForm, AddForm
+from forms import RegistrationForm, LoginForm, TimeSelectForm, EditInformationForm, changePasswordForm, AddForm
 from classes.member import Member
 import datetime
 import time
 import sqlite3
-from flask import request
+from passlib.hash import pbkdf2_sha256
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
+login_manager.login_message = f"Please login to access this page"
+login_manager.login_message_category = "info"
 
 @login_manager.user_loader
 def load_member(member_id):
@@ -21,8 +23,8 @@ def load_member(member_id):
     row = cursor.fetchone()
     if row is None:
         return None
-    else:
-        return Member(int(row[0]), row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9])
+    else:        
+        return Member(int(row[0]), row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12])
 
 
 # Create our tables and insert a few entries
@@ -59,6 +61,19 @@ def item_name_path(list_of_something):
 
     return itemNamesList
 
+def check_unique_email(user_email):
+    conn = db_connection()
+    c = conn.cursor()
+
+    query = "SELECT email FROM member WHERE email = (?)"
+    c.execute(query, [user_email])
+
+    row = c.fetchone()
+    if row is None:
+        return True
+    else:
+        return False
+
 # Run initialize the db before the app starts running
 initialize_db()
 
@@ -92,6 +107,9 @@ def register():
     registration_form = RegistrationForm()
 
     if registration_form.validate_on_submit():
+        if check_unique_email(registration_form.email.data) == False:
+            flash(f'An account with this email already exists!', 'danger')
+            return render_template('register.html', title='Register', registration_form=registration_form)
         conn = db_connection()
         c = conn.cursor()
 
@@ -101,24 +119,32 @@ def register():
 
         # Create the query
         # Note: first value is NULL because sqlite automatically takes care of id
-        query = "INSERT into member VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        query = "INSERT into member VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+
+        hashed_password = pbkdf2_sha256.hash(str(registration_form.password.data))
 
         # Execute the query
         c.execute(query, (
-            registration_form.firstName.data,
-            registration_form.lastName.data,
-            registration_form.email.data,
-            registration_form.password.data,
-            points, currentdate, companyName,
-            registration_form.address.data,
+            registration_form.firstName.data, 
+            registration_form.lastName.data, 
+            registration_form.email.data, 
+            hashed_password, 
+            points, currentdate, companyName, 
+            registration_form.street_address.data,
+            registration_form.city.data,
+            registration_form.zip_code.data,
+            registration_form.province.data, 
             registration_form.birthdate.data
             ))
 
         # Commit the changes
         conn.commit()
 
+        new_member = load_member(c.lastrowid)
+        login_user(new_member)
+
         flash(f'Account created for {registration_form.firstName.data} {registration_form.lastName.data}!', 'success')
-        return redirect(url_for('home'))
+        return redirect(url_for('profile'))
 
     return render_template('register.html', title='Register', registration_form=registration_form)
 
@@ -131,16 +157,20 @@ def login():
     if form.validate_on_submit():
         conn = db_connection()
         c = conn.cursor()
-        c.execute("SELECT * FROM member")
+        query = "SELECT * FROM member WHERE email = (?)"
+        c.execute(query, [str(form.email.data)])
         row = c.fetchone()
+
         if row is not None:
-            if row["email"] == form.email.data and row["password"] == form.password.data:
+            if row["email"] == form.email.data and pbkdf2_sha256.verify(form.password.data, row["member_password"]):
                 valid_member = load_member(row["memberID"])
                 login_user(valid_member, remember=form.remember.data)
-                flash(f'Login successful for {row["fname"]} {row["lname"]}!', 'success')
+                flash(f'{row["fname"]} {row["lname"]} is now logged in!', 'success')
                 return redirect(url_for('home'))
             else:
-                flash(f'Incorrect email or password', 'error')
+                flash(f'Incorrect email or password', '')
+        else:
+            flash(f"Uh oh, looks like you are not a member!", "danger")
 
     return render_template('login.html', title='Login', form=form)
 
@@ -194,7 +224,7 @@ def logout():
     flash(f'{name} has been logged out!', 'success')
     return redirect(url_for('home'))
 
-@app.route("/customerReceipt", methods=['GET'])
+@app.route("/profile/checkout=success/customerReceipt", methods=['GET'])
 @login_required
 def customer_receipt():
     return render_template('customerReceipt.html', title='Customer Receipt')
@@ -202,51 +232,91 @@ def customer_receipt():
 
 @app.route("/profile/editInfo", methods=['GET', 'POST'])
 @login_required
-def editInfo():
+def editInfo(): 
 
     # Get the user informaiton first to diplay in the form
     conn = db_connection()
     c = conn.cursor()
 
-    form = EditInformationForm()
-
-    get_info_query = "SELECT fname, lname, email, password, memberAddress, birthdate FROM member WHERE memberID = (?)"
+    get_info_query = "SELECT * FROM member WHERE memberID = (?)"
     c.execute(get_info_query, str(current_user.id))
     member = c.fetchone()
 
-    if member is not None:
+    form = EditInformationForm()
+
+    if request.method == 'GET':
         form.firstName.data = member["fname"]
         form.lastName.data = member["lname"]
         form.email.data = member["email"]
-        form.password.data = member["password"]
-        form.confirm_password.data = member["password"]
-        form.address.data = member["memberAddress"]
+        form.street_address.data = member["address_street"]
+        form.city.data = member["address_city"]
+        form.zip_code.data = member["address_zip"]
+        form.province.data = member["address_province"]
         form.birthdate.data = member["birthdate"]
-    else:
-        flash(f'User does not exist in the database!', 'error')
 
-    if form.validate_on_submit and form.submit_hidden.data == "notHidden":
+        c.close()
+        conn.close()
+
+    if form.validate_on_submit():
+
+        conn = db_connection()
+        c = conn.cursor()
 
         # Create the query
-        query = "UPDATE member SET fname = (?), lname = (?), email = (?), password = (?), memberAddress = (?), birthdate = (?)"
+        query = "UPDATE member SET fname = (?), lname = (?), email = (?), birthdate = (?), address_street = (?), address_city = (?), address_zip = (?), address_province = (?) WHERE memberID = (?)"
 
         # Execute the query
         c.execute(query, (
-            form.firstName.data,
-            form.lastName.data,
-            form.email.data,
-            form.password.data,
-            form.address.data,
-            form.birthdate.data
-            ))
+            form.firstName.data, 
+            form.lastName.data, 
+            form.email.data, 
+            form.birthdate.data, 
+            form.street_address.data,
+            form.city.data,
+            form.zip_code.data,
+            form.province.data,
+            str(current_user.id)
+            )) 
 
         # Commit the changes
         conn.commit()
         flash(f'Your information has been updated {form.firstName.data}!', 'success')
         return(redirect(url_for('profile')))
 
-
     return render_template('editInfo.html', form=form, title='Edit your information')
+
+@app.route("/profile/editInfo/changePassword", methods=['GET', 'POST'])
+@login_required
+def changePassword():
+
+    change_password_form = changePasswordForm()
+
+    if change_password_form.validate_on_submit():
+
+        conn = db_connection()
+        c = conn.cursor()
+
+        query = "SELECT member_password FROM member WHERE memberID = (?)"
+        c.execute(query, str(current_user.id))
+        old_pass = c.fetchone()
+        print(old_pass)
+        
+        if pbkdf2_sha256.verify(change_password_form.old_password.data, old_pass["member_password"]):
+        
+            query = "UPDATE member SET member_password = (?) WHERE memberID = (?)"
+            
+            hashed_password = pbkdf2_sha256.hash(change_password_form.new_password.data)
+            
+            c.execute(query, (hashed_password, str(current_user.id)))
+            conn.commit()
+
+            flash(f"Your password has been updated", "success")
+            return redirect(url_for('profile'))
+
+        else:
+            flash(f"Unable to make changes: Your old password is incorrect", "danger")
+
+    return render_template('changePassword.html', change_password_form=change_password_form, title='Change Password') 
 
 @app.route('/searchResults')
 def searchResults():
@@ -263,7 +333,7 @@ def searchResults():
     matching_items = c.fetchall()
     matching_items_images = item_name_path(matching_items)
 
-    return render_template('searchResults.html', matching_items=matching_items, matching_items_images=matching_items_images, length=len(matching_items), title='Search results')
+    return render_template('searchResults.html', matching_items=matching_items, matching_items_images=matching_items_images, length=len(matching_items), search_query=str(temp), title='Search results')
 
 @app.route("/ProductDescription/<itemID>")
 def show(itemID):
@@ -277,7 +347,7 @@ def show(itemID):
 
 
 
-@app.route("/cart")
+@app.route("/cart", methods=['GET'])
 @login_required
 def cart():
     conn = db_connection()

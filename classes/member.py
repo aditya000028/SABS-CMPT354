@@ -1,7 +1,7 @@
 from flask_login import UserMixin
 
 class Member(UserMixin):
-    def __init__(self, id, fname, lname, email, password, points, registeredDate, companyName, memberAddress, birthdate):
+    def __init__(self, id, fname, lname, email, password, points, registeredDate, companyName, address_street, address_city, address_zip, address_province, birthdate):
         self.id = id
         self.fname = fname
         self.lname = lname
@@ -10,7 +10,10 @@ class Member(UserMixin):
         self.points = points
         self.registeredDate = registeredDate
         self.companyName = companyName
-        self.memberAddress = memberAddress
+        self.address_street = address_street
+        self.address_city = address_city
+        self.address_zip = address_zip
+        self.address_province = address_province
         self.birthdate = birthdate
         self.authenticated = False
 
