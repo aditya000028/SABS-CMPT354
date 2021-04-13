@@ -48,7 +48,7 @@ CREATE TABLE employee
     lastName varchar(255) NOT NULL,
     startDate char(10) NOT NULL,
     email varchar(255) NOT NULL,
-    password varchar(255) NOT NULL,
+    employee_password text NOT NULL,
     FOREIGN KEY (managerID) REFERENCES manager(managerID)
         ON DELETE SET DEFAULT
   		ON UPDATE CASCADE,
@@ -150,12 +150,15 @@ CREATE TABLE item
 
 CREATE TABLE cart
 ( 
-    productID INTEGER,
-    memberID INTEGER NOT NULL,
-  	CHECK(productID > 0),
-  	CHECK(memberID > 0),
-    FOREIGN KEY(memberID) REFERENCES member(memberID),
-    FOREIGN KEY(productID) REFERENCES item(itemID)
+    cartID INTEGER NOT NULL,
+    objectID INTEGER NOT NULL,
+    objectName varchar(255),
+    objectPrice float NOT NULL,
+  	CHECK(cartID > 0),
+    FOREIGN KEY(cartID) REFERENCES member(memberID),
+    FOREIGN KEY(objectID) REFERENCES item(itemID),
+    FOREIGN KEY(objectName) REFERENCES item(itemName),
+    FOREIGN KEY(objectPrice) REFERENCES item(price)
   		on delete CASCADE
 );
 
@@ -285,11 +288,11 @@ CREATE TABLE writes
 );
 
 /* Add members to database */
-Insert into member values (1, 'Bruce', 'Wayne', 'Batman@gmail.com', 'Batman', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', 'Surrey', 'V9Y3Q1', 'BC', '1950-05-12');
-Insert into member values (2, 'Peter', 'Parker', 'Spiderman@gmail.com', 'Spidey', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', 'Vancouver', 'V9Y3Q1', 'BC', '1950-05-12');
-Insert into member values (3, 'Aubrey', 'Graham', 'Drake@gmail.com', 'Drake', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', 'Burnaby', 'V9Y3Q1', 'BC', '1950-05-12');
-Insert into member values (4, 'Steph', 'Curry', 'splash@gmail.com', 'Chef', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', 'Richmond', 'V9Y3Q1', 'BC', '1950-05-12');
-Insert into member values (5, 'Elias', 'Pettersson', 'Petey@gmail.com', 'Petey', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', 'Toronto', 'V9Y3Q1', 'TO', '1950-05-12');
+Insert into member values (1, 'Bruce', 'Wayne', 'Batman@gmail.com', 'Batman', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', '1950-05-12');
+Insert into member values (2, 'Peter', 'Parker', 'Spiderman@gmail.com', 'Spidey', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', '1950-05-12');
+Insert into member values (3, 'Aubrey', 'Graham', 'Drake@gmail.com', 'Drake', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', '1950-05-12');
+Insert into member values (4, 'Steph', 'Curry', 'splash@gmail.com', 'Chef', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', '1950-05-12');
+Insert into member values (5, 'Elias', 'Pettersson', 'Petey@gmail.com', 'Petey', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', '1950-05-12');
 
 /* Add managers into table */
 Insert into manager values (1, 'TempFirst', 'TempLast', 60000);
@@ -359,14 +362,8 @@ Insert into item values (24, 'Professional Size Basketball', 'Wilson', '20x20x20
 Insert into item values (25, 'Basketball Air Pump', 'Sony', '5x10x20', 15.99, 65, 0, 'Sporting', 'SABS General Store');
 
 /* Add cart to table */
-Insert into cart values (1, 1);
-Insert into cart values (2, 2);
-Insert into cart values (3, 3);
-Insert into cart values (4, 4);
-Insert into cart values (1, 5);
-Insert into cart values (1, 7);
-Insert into cart values (1, 8);
-Insert into cart values (5, 6);
+Insert into cart values (1, 25, 'Basketball Air Pump', 15.99);
+Insert into cart values(1, 9, 'Pencil Sharpener', 2.99);
 
 /* Add empWorks to table */
 Insert into empWorks values (1, 1, '2016-12-12');
@@ -435,4 +432,3 @@ Insert into writes values (2, 2, 2);
 Insert into writes values (3, 3, 3);
 Insert into writes values (4, 4, 4);
 Insert into writes values (5, 5, 5);
-

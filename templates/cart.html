@@ -7,5 +7,22 @@
                 <hr>
             </div> 
         </div>
+        <div class="row">
+            {% for x in range(length) %}
+            <article class="media">
+            <div class="media-body">
+                <div class="article-metadata">
+                <div class="rectangle"></div>
+                <h6><a href='{{ url_for("show", itemID=items[x].objectID)}}'><b>{{ items[x].objectName }}</b></a></h6>
+                <p class="article-content"><b>price: </b>{{ items[x].objectPrice }}</p>
+            </div>
+            <article>
+        {% endfor %}
+        <h6>Your total is: {{total}}</h6>
+        <br>
+        <h5><a href='{{ url_for("home")}}'><b>Keep Shopping</b></a></h5>
+        </div>
     </div>
 {% endblock content %}
+
+

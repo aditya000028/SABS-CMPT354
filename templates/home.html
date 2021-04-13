@@ -1,17 +1,76 @@
 {% extends "layout.html" %}
 {% block content %}
-    {% for x in range(length) %}
-        <article class="media">
-          <div class="media-body">
-            <div class="article-metadata">
-            <div class="rectangle"></div>
-            <h2><a class="article-title" href="#">{{ items[x].itemName }}</a></h2>
-            <p class="article-content" id="price"><b>{{ items[x].price }}</b></p>
-            <p class="article-content"><b>Brand:</b>{{ items[x].brand }}</p>
-            <p class="article-content"><b>Dimensions:</b>{{ items[x].size }}</p>
-            <p class="article-content"><b>In Stock:</b>{{ items[x].stock }}</p>
-            <img src={{item_names_list[x]}} style="width:50%;height:auto;">
+{% set sort_on = request.args.sort_on|default('itemName') %}
+{% set brand = request.args.brand|default(null) %}
+<div class="row">
+    <div class="col-2 p-2 border rounded">
+      <div>
+        <h6 class="p-1 border-bottom">Department</h6>
+        <ul>
+            <li><a href="#">Meat</a></li>
+            <li><a href="#">Bread</a></li>
+            <li><a href="#">Stuff</a></li>
+            <li><a href="#">MoreStuff</a></li>
+        </ul>
+    </div>
+    <div>
+        <h6 class="p-1 border-bottom">Filter By</h6>
+        <div class="form-inline border rounded p-sm-2 my-2">
+            <input class="form-check-input" type="checkbox" id="instockcheck" disabled>
+          <label class="form-check-label" for="instockcheck">In Stock Only</label>
+        </div>
+
+        <p>
+          <a data-toggle="collapse" href="#brandsgroup">Brand</a>
+        </p>
+        <div id="brandsgroup" class="collapse">
+          <ul class="list-group">
+            <li class="list-group-item list-group-item-action mb-2 rounded"><a href="{{ url_for('home', sort_on=sort_on, brand='BIC')}}"> BIC </a></li>
+            <li class="list-group-item list-group-item-action mb-2 rounded"><a href="#"> brandname </a></li>
+            <li class="list-group-item list-group-item-action mb-2 rounded"><a href="#"> brandname</a></li>
+        </ul>
+        </div>
+        <p>
+          <a data-toggle="collapse" href="#sizesgroup">Size</a>
+        </p>
+        <div id="sizesgroup" class="collapse">
+          <ul class="list-group">
+            <li class="list-group-item list-group-item-action mb-2 rounded"><a href="#"> big</a></li>
+            <li class="list-group-item list-group-item-action mb-2 rounded"><a href="#"> medium </a></li>
+            <li class="list-group-item list-group-item-action mb-2 rounded"><a href="#"> small</a></li>
+        </ul>
+        </div>
+    </div>
+    </div>
+    <div class="col-10">
+      <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Sort by
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <a class="dropdown-item {{'active' if sort_on == 'itemName' }}" href="{{ url_for('home', sort_on='itemName', brand=brand) }}">Item Name</a>
+          <a class="dropdown-item {{'active' if sort_on == 'brand' }}" href="{{ url_for('home', sort_on='brand', brand=brand) }}">Brand Name</a>
+          <a class="dropdown-item {{'active' if sort_on == 'stock' }}" href="{{ url_for('home', sort_on='stock', brand=brand) }}">Stock (asc)</a>
+          <a class="dropdown-item {{'active' if sort_on == 'price' }}" href="{{ url_for('home', sort_on='price', brand=brand) }}">Price (asc)</a>
+          <a class="dropdown-item {{'active' if sort_on == 'size' }}" href="{{ url_for('home', sort_on='size', brand=brand) }}">Size</a>
+        </div>
+      </div>
+      <div class="row p-2">
+        {% for x in items | sort(attribute=sort_on) %}
+          <div class="container-fluid media align-items-lg-center pt-5">
+            <img class="img-fluid w-50 ml-lg-5 order-1 or-lg-2" id="productpicture" src={{x.image}}>
+            <div class="media-body order-2 order-lg-1 pl-5">
+              <h2><a id="itemname" href="#">{{ x.itemName }}</a></h2>
+              <p id="itemprice"><b> {{ x.price }}</b></p>
+              <p><b>Brand:</b> {{ x.brand }}</p>
+              <p><b>Dimensions:</b> {{ x.size }}</p>
+              <p><b>In Stock:</b> {{ x.stock }}</p>
+              <a href='{{ url_for("show", itemID=x.itemID) }}'>Product Description</a>
+              <a href='{{ url_for("add_to_cart", itemID=x.itemID) }}'><b>Add to Cart</b></a>
+            </div>
           </div>
-        <article>
-    {% endfor %}
+        {% endfor %}
+      </div>
+    </div>
+</div>
 {% endblock content %}

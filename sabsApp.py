@@ -1,6 +1,6 @@
 from flask import Flask, render_template, url_for, flash, redirect, request, Response
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
-from forms import RegistrationForm, LoginForm, TimeSelectForm, EditInformationForm, changePasswordForm
+from forms import RegistrationForm, LoginForm, TimeSelectForm, EditInformationForm, changePasswordForm, AddForm
 from classes.member import Member
 import datetime
 import time
@@ -80,19 +80,28 @@ initialize_db()
 @app.route("/")
 @app.route("/home")
 def home():
-    
+    query = "SELECT * FROM item"
+    if ('brand' in request.args and  request.args.get('brand', type=str) != ""):
+        query = "SELECT * FROM item WHERE brand=\"" + request.args.get('brand', type=str) + '\"'
+
     conn = db_connection()
     c = conn.cursor()
-    c.execute("SELECT * FROM item")
-    
+    c.execute(query)
+
     items = c.fetchall()
 
-    item_names_list = item_name_path(items)
+    # Create the path to display item images
+    itemNamesList = []
+    for x in items:
+        name = "../static/images/"
+        name = name + str(x["itemName"]).replace(" ", "")
+        name = name + ".png"
+        x['image'] = name
 
-    return render_template('home.html', items=items, item_names_list=item_names_list, length=len(items))
+    return render_template('home.html', items=items, item_names_list=itemNamesList, length=len(items))
 
 
-@app.route("/register", methods=['GET', 'POST'])
+@app.route("/register", methods=['GET'])
 def register():
 
     registration_form = RegistrationForm()
@@ -126,10 +135,10 @@ def register():
             registration_form.zip_code.data,
             registration_form.province.data, 
             registration_form.birthdate.data
-            )) 
+            ))
 
         # Commit the changes
-        conn.commit() 
+        conn.commit()
 
         new_member = load_member(c.lastrowid)
         login_user(new_member)
@@ -143,7 +152,7 @@ def register():
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('profile'))
-    
+
     form = LoginForm()
     if form.validate_on_submit():
         conn = db_connection()
@@ -165,6 +174,8 @@ def login():
 
     return render_template('login.html', title='Login', form=form)
 
+
+
 @app.route("/profile/pastPurchases", methods=['GET', 'POST'])
 @login_required
 def pastPurchases():
@@ -176,7 +187,7 @@ def pastPurchases():
     form = TimeSelectForm()
 
     if form.validate_on_submit:
-        current_time = int(time.time())          
+        current_time = int(time.time())
 
         if form.timeInput.data == "All":
             items_query = "SELECT * FROM buys WHERE memberID = (?)"
@@ -268,7 +279,7 @@ def editInfo():
             )) 
 
         # Commit the changes
-        conn.commit() 
+        conn.commit()
         flash(f'Your information has been updated {form.firstName.data}!', 'success')
         return(redirect(url_for('profile')))
 
@@ -309,7 +320,7 @@ def changePassword():
 
 @app.route('/searchResults')
 def searchResults():
-    
+
     user_query = "%"
     temp = request.args.get("q")
     user_query = user_query + str(temp) + "%"
@@ -324,23 +335,69 @@ def searchResults():
 
     return render_template('searchResults.html', matching_items=matching_items, matching_items_images=matching_items_images, length=len(matching_items), search_query=str(temp), title='Search results')
 
-@app.route("/profile/cart", methods=['GET'])
+@app.route("/ProductDescription/<itemID>")
+def show(itemID):
+    conn = db_connection()
+    c = conn.cursor()
+    temp = str(itemID)
+    query = "SELECT * FROM item WHERE itemID = (?)"
+    c.execute(query, (temp,))
+    item = c.fetchone()
+    return render_template('ProductDescription.html', item =item, title = 'Description' )
+
+
+
+@app.route("/cart", methods=['GET'])
 @login_required
 def cart():
     conn = db_connection()
     c = conn.cursor()
-    items_query = "SELECT item.itemName, item.price FROM cart, item WHERE cart.memberID = (?) AND cart.productID = item.itemID"
+    items_query = "SELECT * FROM cart WHERE cartID = (?)"
     c.execute(items_query, str(current_user.id))
     items = c.fetchall()
-    return render_template('cart.html', title = 'CART')
 
-@app.route("/profile/cart<int:cart_id>/checkout", methods=['GET'])
+    sum = 0
+    for x in items:
+        sum = sum + x['objectPrice'] 
+ 
+    return render_template('cart.html', items = items, length = len(items), total = sum, title = 'cart')
+
+
+@app.route('/cart/<int:itemID>')
 @login_required
-def checkout(cart_id):
-    shipping_address_form = RegistrationForm()
-    
-    return render_template('checkout.html', title='Checkout items')
+def add_to_cart(itemID):
+    conn = db_connection()
+    c = conn.cursor()
+    temp = str(itemID)
+    query = "SELECT * FROM item WHERE itemID = (?)"
+    c.execute(query, (temp,))
+    item = c.fetchone()
 
+    query2 = "INSERT into cart VALUES (?, ?, ?, ?)"
+    c.execute(query2,(current_user.id,item['itemID'], item['itemName'], item['price']))
+    conn.commit()
+    return redirect(url_for('cart'))
+    
+
+
+@app.route("/add", methods=['GET', 'POST'])
+def add():
+    form = AddForm()
+
+    if form.validate_on_submit():
+        conn = sqlite3.connect('sabs.db')
+        c = conn.cursor()
+
+        try:
+            query = "Insert into items(itemid, itemName, brand, size, price, stock) VALUES (?, ?, ?, ?, ?, ?)"
+            c.execute(query, (form.itemid.data, form.itemName.data, form.brand.data, form.size.data, form.price.data, form.stock.data)) #Execute the query
+            conn.commit() #Commit the changes
+            flash(f'{form.itemName.data} added to database with the ID of {form.itemid.data}!', 'success')
+            return redirect(url_for('home'))
+        except:
+            flash(f'{form.itemName.data} failed to be added to the DB!', 'danger')
+
+    return render_template('add.html', title='Add', form=form)
 
 if __name__ == '__main__':
     app.run(debug=True)
