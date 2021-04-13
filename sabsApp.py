@@ -11,6 +11,8 @@ app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
+login_manager.login_message = f"Please login to access this page"
+login_manager.login_message_category = "info"
 
 @login_manager.user_loader
 def load_member(member_id):
@@ -21,7 +23,7 @@ def load_member(member_id):
     if row is None:
         return None
     else:        
-        return Member(int(row[0]), row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9])
+        return Member(int(row[0]), row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12])
 
 
 # Create our tables and insert a few entries
@@ -58,6 +60,19 @@ def item_name_path(list_of_something):
 
     return itemNamesList
 
+def check_unique_email(user_email):
+    conn = db_connection()
+    c = conn.cursor()
+
+    query = "SELECT email FROM member WHERE email = (?)"
+    c.execute(query, [user_email])
+
+    row = c.fetchone()
+    if row is None:
+        return True
+    else:
+        return False
+
 # Run initialize the db before the app starts running
 initialize_db()
 
@@ -82,16 +97,19 @@ def register():
     registration_form = RegistrationForm()
 
     if registration_form.validate_on_submit():
+        if check_unique_email(registration_form.email.data) == False:
+            flash(f'An account with this email already exists!', 'danger')
+            return render_template('register.html', title='Register', registration_form=registration_form)
         conn = db_connection()
         c = conn.cursor()
 
         points = 10
         currentdate = str(datetime.date.today())
         companyName = 'SABS General Store'
-        
+
         # Create the query
         # Note: first value is NULL because sqlite automatically takes care of id
-        query = "INSERT into member VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        query = "INSERT into member VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
         # Execute the query
         c.execute(query, (
@@ -100,15 +118,21 @@ def register():
             registration_form.email.data, 
             registration_form.password.data, 
             points, currentdate, companyName, 
-            registration_form.address.data, 
+            registration_form.street_address.data,
+            registration_form.city.data,
+            registration_form.zip_code.data,
+            registration_form.province.data, 
             registration_form.birthdate.data
             )) 
 
         # Commit the changes
         conn.commit() 
 
+        new_member = load_member(c.lastrowid)
+        login_user(new_member)
+
         flash(f'Account created for {registration_form.firstName.data} {registration_form.lastName.data}!', 'success')
-        return redirect(url_for('home'))
+        return redirect(url_for('profile'))
 
     return render_template('register.html', title='Register', registration_form=registration_form)
 
@@ -121,16 +145,20 @@ def login():
     if form.validate_on_submit():
         conn = db_connection()
         c = conn.cursor()
-        c.execute("SELECT * FROM members")
+        query = "SELECT * FROM member WHERE email = (?)"
+        c.execute(query, [str(form.email.data)])
         row = c.fetchone()
+
         if row is not None:
             if row["email"] == form.email.data and row["password"] == form.password.data:
-                valid_member = load_member(row["id"])
+                valid_member = load_member(row["memberID"])
                 login_user(valid_member, remember=form.remember.data)
-                flash(f'Login successful for {row["fname"]} {row["lname"]}!', 'success')
+                flash(f'{row["fname"]} {row["lname"]} is now logged in!', 'success')
                 return redirect(url_for('home'))
             else:
-                flash(f'Incorrect email or password', 'error')
+                flash(f'Incorrect email or password', '')
+        else:
+            flash(f"Uh oh, looks like you are not a member!", "danger")
 
     return render_template('login.html', title='Login', form=form)
 
@@ -182,7 +210,7 @@ def logout():
     flash(f'{name} has been logged out!', 'success')
     return redirect(url_for('home'))
 
-@app.route("/customerReceipt", methods=['GET'])
+@app.route("/profile/checkout=success/customerReceipt", methods=['GET'])
 @login_required
 def customer_receipt():
     return render_template('customerReceipt.html', title='Customer Receipt')
@@ -190,33 +218,40 @@ def customer_receipt():
 
 @app.route("/profile/editInfo", methods=['GET', 'POST'])
 @login_required
-def editInfo():
+def editInfo(): 
 
     # Get the user informaiton first to diplay in the form
     conn = db_connection()
     c = conn.cursor()
 
-    form = EditInformationForm()
-
-    get_info_query = "SELECT fname, lname, email, password, memberAddress, birthdate FROM member WHERE memberID = (?)"
+    get_info_query = "SELECT * FROM member WHERE memberID = (?)"
     c.execute(get_info_query, str(current_user.id))
     member = c.fetchone()
 
-    if member is not None:
+    form = EditInformationForm()
+
+    if request.method == 'GET':
         form.firstName.data = member["fname"]
         form.lastName.data = member["lname"]
         form.email.data = member["email"]
         form.password.data = member["password"]
         form.confirm_password.data = member["password"]
-        form.address.data = member["memberAddress"]
+        form.street_address.data = member["address_street"]
+        form.city.data = member["address_city"]
+        form.zip_code.data = member["address_zip"]
+        form.province.data = member["address_province"]
         form.birthdate.data = member["birthdate"]
-    else:
-        flash(f'User does not exist in the database!', 'error')
 
-    if form.validate_on_submit and form.submit_hidden.data == "notHidden":
+        c.close()
+        conn.close()
+
+    if form.validate_on_submit():
+
+        conn = db_connection()
+        c = conn.cursor()
 
         # Create the query
-        query = "UPDATE member SET fname = (?), lname = (?), email = (?), password = (?), memberAddress = (?), birthdate = (?)"
+        query = "UPDATE member SET fname = (?), lname = (?), email = (?), password = (?), birthdate = (?), address_street = (?), address_city = (?), address_zip = (?), address_province = (?) WHERE memberID = (?)"
 
         # Execute the query
         c.execute(query, (
@@ -224,8 +259,12 @@ def editInfo():
             form.lastName.data, 
             form.email.data, 
             form.password.data,
-            form.address.data, 
-            form.birthdate.data
+            form.birthdate.data, 
+            form.street_address.data,
+            form.city.data,
+            form.zip_code.data,
+            form.province.data,
+            str(current_user.id)
             )) 
 
         # Commit the changes
@@ -233,7 +272,7 @@ def editInfo():
         flash(f'Your information has been updated {form.firstName.data}!', 'success')
         return(redirect(url_for('profile')))
 
-
+    print("returning")
     return render_template('editInfo.html', form=form, title='Edit your information')
 
 @app.route('/searchResults')
@@ -253,7 +292,7 @@ def searchResults():
 
     return render_template('searchResults.html', matching_items=matching_items, matching_items_images=matching_items_images, length=len(matching_items), search_query=str(temp), title='Search results')
 
-@app.route("/cart", methods=['GET'])
+@app.route("/profile/cart", methods=['GET'])
 @login_required
 def cart():
     conn = db_connection()
@@ -262,6 +301,13 @@ def cart():
     c.execute(items_query, str(current_user.id))
     items = c.fetchall()
     return render_template('cart.html', title = 'CART')
+
+@app.route("/profile/cart<int:cart_id>/checkout", methods=['GET'])
+@login_required
+def checkout(cart_id):
+    shipping_address_form = RegistrationForm()
+    
+    return render_template('checkout.html', title='Checkout items')
 
 
 if __name__ == '__main__':

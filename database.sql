@@ -101,7 +101,10 @@ CREATE TABLE member
     points INTEGER NOT NULL,
     registeredDate varchar(255) NOT NULL,
     companyName varchar(255) NOT NULL,
-    memberAddress varchar(255),
+    address_street varchar(255),
+    address_city char(2),
+    address_zip char(6),
+    address_province varchar(255),
     birthdate char(10),
   	CHECK(points >= 0),
     FOREIGN KEY(companyName) REFERENCES company(companyName)
@@ -114,9 +117,11 @@ CREATE TRIGGER validate_member_before_insert_member
 BEGIN
    SELECT
       CASE
-		WHEN NEW.email NOT LIKE '%_@__%.__%' THEN RAISE (ABORT,'Invalid email address')
-		WHEN NEW.birthdate NOT LIKE '____-__-__' THEN RAISE (ABORT,'Invalid birth date')
-        WHEN NEW.registeredDate NOT LIKE '____-__-__' THEN RAISE (ABORT,'Invalid registry date')
+		WHEN NEW.email NOT LIKE '%_@_%.__%' AND length(NEW.email) > 0 THEN RAISE (ABORT,'Invalid email address')
+		WHEN NEW.birthdate NOT LIKE '____-__-__' AND length(NEW.birthdate) > 0 THEN RAISE (ABORT,'Invalid birth date')
+    WHEN NEW.registeredDate NOT LIKE '____-__-__' THEN RAISE (ABORT,'Invalid registry date')
+    WHEN NEW.address_zip NOT LIKE '______' AND length(NEW.address_zip) > 0 THEN RAISE (ABORT,'Invalid zip code length')
+    WHEN NEW.address_province NOT LIKE '__' AND length(NEW.address_province) > 0 THEN RAISE (ABORT, 'Invalid province')
       END;
 END;
 
@@ -145,7 +150,7 @@ CREATE TABLE item
 
 CREATE TABLE cart
 ( 
-    productID INTEGER NOT NULL,
+    productID INTEGER,
     memberID INTEGER NOT NULL,
   	CHECK(productID > 0),
   	CHECK(memberID > 0),
@@ -280,11 +285,11 @@ CREATE TABLE writes
 );
 
 /* Add members to database */
-Insert into member values (1, 'Bruce', 'Wayne', 'Batman@gmail.com', 'Batman', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', '1950-05-12');
-Insert into member values (2, 'Peter', 'Parker', 'Spiderman@gmail.com', 'Spidey', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', '1950-05-12');
-Insert into member values (3, 'Aubrey', 'Graham', 'Drake@gmail.com', 'Drake', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', '1950-05-12');
-Insert into member values (4, 'Steph', 'Curry', 'splash@gmail.com', 'Chef', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', '1950-05-12');
-Insert into member values (5, 'Elias', 'Pettersson', 'Petey@gmail.com', 'Petey', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', '1950-05-12');
+Insert into member values (1, 'Bruce', 'Wayne', 'Batman@gmail.com', 'Batman', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', 'Surrey', 'V9Y3Q1', 'BC', '1950-05-12');
+Insert into member values (2, 'Peter', 'Parker', 'Spiderman@gmail.com', 'Spidey', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', 'Vancouver', 'V9Y3Q1', 'BC', '1950-05-12');
+Insert into member values (3, 'Aubrey', 'Graham', 'Drake@gmail.com', 'Drake', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', 'Burnaby', 'V9Y3Q1', 'BC', '1950-05-12');
+Insert into member values (4, 'Steph', 'Curry', 'splash@gmail.com', 'Chef', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', 'Richmond', 'V9Y3Q1', 'BC', '1950-05-12');
+Insert into member values (5, 'Elias', 'Pettersson', 'Petey@gmail.com', 'Petey', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', 'Toronto', 'V9Y3Q1', 'TO', '1950-05-12');
 
 /* Add managers into table */
 Insert into manager values (1, 'TempFirst', 'TempLast', 60000);
@@ -430,3 +435,4 @@ Insert into writes values (2, 2, 2);
 Insert into writes values (3, 3, 3);
 Insert into writes values (4, 4, 4);
 Insert into writes values (5, 5, 5);
+
