@@ -288,11 +288,11 @@ CREATE TABLE writes
 );
 
 /* Add members to database */
-Insert into member values (1, 'Bruce', 'Wayne', 'Batman@gmail.com', 'Batman', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', '1950-05-12');
-Insert into member values (2, 'Peter', 'Parker', 'Spiderman@gmail.com', 'Spidey', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', '1950-05-12');
-Insert into member values (3, 'Aubrey', 'Graham', 'Drake@gmail.com', 'Drake', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', '1950-05-12');
-Insert into member values (4, 'Steph', 'Curry', 'splash@gmail.com', 'Chef', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', '1950-05-12');
-Insert into member values (5, 'Elias', 'Pettersson', 'Petey@gmail.com', 'Petey', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', '1950-05-12');
+Insert into member values (1, 'Bruce', 'Wayne', 'Batman@gmail.com', 'Batman', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', 'Surrey', 'V9Y3Q1', 'BC', '1950-05-12');
+Insert into member values (2, 'Peter', 'Parker', 'Spiderman@gmail.com', 'Spidey', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', 'Vancouver', 'V9Y3Q1', 'BC', '1950-05-12');
+Insert into member values (3, 'Aubrey', 'Graham', 'Drake@gmail.com', 'Drake', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', 'Burnaby', 'V9Y3Q1', 'BC', '1950-05-12');
+Insert into member values (4, 'Steph', 'Curry', 'splash@gmail.com', 'Chef', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', 'Richmond', 'V9Y3Q1', 'BC', '1950-05-12');
+Insert into member values (5, 'Elias', 'Pettersson', 'Petey@gmail.com', 'Petey', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', 'Toronto', 'V9Y3Q1', 'TO', '1950-05-12');
 
 /* Add managers into table */
 Insert into manager values (1, 'TempFirst', 'TempLast', 60000);
