@@ -16,9 +16,7 @@ class RegistrationForm(FlaskForm):
     confirm_password = PasswordField('Confirm Password *', validators=[DataRequired(), EqualTo('password', message='Passwords do not match')])
     submit = SubmitField('Sign Up')
 
-class LoginForm(FlaskForm):
-    email = StringField('Email *',validators=[Email(), DataRequired()])
-    password = PasswordField('Password *', validators=[DataRequired()])
+class LoginForm(RegistrationForm):
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
 
@@ -28,3 +26,9 @@ class TimeSelectForm(FlaskForm):
 
 class EditInformationForm(RegistrationForm):
     update = SubmitField('Update')
+
+class changePasswordForm(FlaskForm):
+    old_password = PasswordField('Old Password *', validators=[DataRequired()])
+    new_password = PasswordField('New Password *', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm Password *', validators=[DataRequired(), EqualTo('new_password', message='Password confirmation does not match new password')])
+    update_password = SubmitField('Update Password')

@@ -97,7 +97,7 @@ CREATE TABLE member
     fname varchar(255) NOT NULL,
     lname varchar(255) NOT NULL,
     email varchar(255),
-    password varchar(255) NOT NULL,
+    member_password text NOT NULL,
     points INTEGER NOT NULL,
     registeredDate varchar(255) NOT NULL,
     companyName varchar(255) NOT NULL,

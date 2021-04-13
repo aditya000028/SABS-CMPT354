@@ -1,10 +1,11 @@
 from flask import Flask, render_template, url_for, flash, redirect, request, Response
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
-from forms import RegistrationForm, LoginForm, TimeSelectForm, EditInformationForm
+from forms import RegistrationForm, LoginForm, TimeSelectForm, EditInformationForm, changePasswordForm
 from classes.member import Member
 import datetime
 import time
 import sqlite3
+from passlib.hash import pbkdf2_sha256
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
@@ -111,12 +112,14 @@ def register():
         # Note: first value is NULL because sqlite automatically takes care of id
         query = "INSERT into member VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
+        hashed_password = pbkdf2_sha256.hash(str(registration_form.password.data))
+
         # Execute the query
         c.execute(query, (
             registration_form.firstName.data, 
             registration_form.lastName.data, 
             registration_form.email.data, 
-            registration_form.password.data, 
+            hashed_password, 
             points, currentdate, companyName, 
             registration_form.street_address.data,
             registration_form.city.data,
@@ -150,7 +153,7 @@ def login():
         row = c.fetchone()
 
         if row is not None:
-            if row["email"] == form.email.data and row["password"] == form.password.data:
+            if row["email"] == form.email.data and pbkdf2_sha256.verify(form.password.data, row["member_password"]):
                 valid_member = load_member(row["memberID"])
                 login_user(valid_member, remember=form.remember.data)
                 flash(f'{row["fname"]} {row["lname"]} is now logged in!', 'success')
@@ -234,8 +237,6 @@ def editInfo():
         form.firstName.data = member["fname"]
         form.lastName.data = member["lname"]
         form.email.data = member["email"]
-        form.password.data = member["password"]
-        form.confirm_password.data = member["password"]
         form.street_address.data = member["address_street"]
         form.city.data = member["address_city"]
         form.zip_code.data = member["address_zip"]
@@ -251,14 +252,13 @@ def editInfo():
         c = conn.cursor()
 
         # Create the query
-        query = "UPDATE member SET fname = (?), lname = (?), email = (?), password = (?), birthdate = (?), address_street = (?), address_city = (?), address_zip = (?), address_province = (?) WHERE memberID = (?)"
+        query = "UPDATE member SET fname = (?), lname = (?), email = (?), birthdate = (?), address_street = (?), address_city = (?), address_zip = (?), address_province = (?) WHERE memberID = (?)"
 
         # Execute the query
         c.execute(query, (
             form.firstName.data, 
             form.lastName.data, 
             form.email.data, 
-            form.password.data,
             form.birthdate.data, 
             form.street_address.data,
             form.city.data,
@@ -272,8 +272,40 @@ def editInfo():
         flash(f'Your information has been updated {form.firstName.data}!', 'success')
         return(redirect(url_for('profile')))
 
-    print("returning")
     return render_template('editInfo.html', form=form, title='Edit your information')
+
+@app.route("/profile/editInfo/changePassword", methods=['GET', 'POST'])
+@login_required
+def changePassword():
+
+    change_password_form = changePasswordForm()
+
+    if change_password_form.validate_on_submit():
+
+        conn = db_connection()
+        c = conn.cursor()
+
+        query = "SELECT member_password FROM member WHERE memberID = (?)"
+        c.execute(query, str(current_user.id))
+        old_pass = c.fetchone()
+        print(old_pass)
+        
+        if pbkdf2_sha256.verify(change_password_form.old_password.data, old_pass["member_password"]):
+        
+            query = "UPDATE member SET member_password = (?) WHERE memberID = (?)"
+            
+            hashed_password = pbkdf2_sha256.hash(change_password_form.new_password.data)
+            
+            c.execute(query, (hashed_password, str(current_user.id)))
+            conn.commit()
+
+            flash(f"Your password has been updated", "success")
+            return redirect(url_for('profile'))
+
+        else:
+            flash(f"Unable to make changes: Your old password is incorrect", "danger")
+
+    return render_template('changePassword.html', change_password_form=change_password_form, title='Change Password') 
 
 @app.route('/searchResults')
 def searchResults():
