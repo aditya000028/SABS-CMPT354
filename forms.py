@@ -25,9 +25,12 @@ class AddForm(FlaskForm):
     stock = IntegerField('stock', validators=[DataRequired()])
     submit = SubmitField('Add')
 
-class LoginForm(RegistrationForm):
+# Should inherit RegistrationForm, but inheritance not working in validate_on_submit in app script
+class LoginForm(FlaskForm):
+    email = StringField('Email *', validators=[Email(), DataRequired()])
+    password = PasswordField('Password *', validators=[DataRequired()])
     remember = BooleanField('Remember Me')
-    submit = SubmitField('Login')
+    login = SubmitField('Login')
 
 class TimeSelectForm(FlaskForm):
     timeInput = RadioField('Time Period', choices=[('All', 'All Orders'), ('SevenDays', '7 Days'), ('OneMonth', '1 Month')], default='All')
@@ -36,8 +39,20 @@ class TimeSelectForm(FlaskForm):
 class EditInformationForm(RegistrationForm):
     update = SubmitField('Update')
 
-class changePasswordForm(FlaskForm):
+class ChangePasswordForm(FlaskForm):
     old_password = PasswordField('Old Password *', validators=[DataRequired()])
     new_password = PasswordField('New Password *', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password *', validators=[DataRequired(), EqualTo('new_password', message='Password confirmation does not match new password')])
     update_password = SubmitField('Update Password')
+
+# Should inherit RegistrationForm, but inheritance not working in validate_on_submit in app script
+class CheckoutForm(FlaskForm):
+    street_address = StringField('Street Address *', validators=[Length(max=255), DataRequired()])
+    province = SelectField('Province *', choices=['BC', 'AB', 'ON', 'NL', 'PE', 'NS', 'NB', 'QC', 'MB', 'SK', 'YT', 'NT', 'NU'], validators=[DataRequired()])
+    city = StringField('City *', validators=[Length(max=255), DataRequired()])
+    zip_code = StringField('Zip Code *', validators=[Length(max=6), DataRequired()])
+    card_number = IntegerField('Card Number *', validators=[DataRequired()])
+    expiry_month = IntegerField('Expiry Month *', validators=[DataRequired()])
+    expiry_year = IntegerField('Expiry Year *', validators=[DataRequired()])
+    card_cvv = IntegerField('CVV *', validators=[DataRequired()])
+    place_order = SubmitField('Place Order')

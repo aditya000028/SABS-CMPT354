@@ -1,6 +1,7 @@
 from flask import Flask, render_template, url_for, flash, redirect, request, Response
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
-from forms import RegistrationForm, LoginForm, TimeSelectForm, EditInformationForm, changePasswordForm, AddForm
+from forms import RegistrationForm, LoginForm, TimeSelectForm, EditInformationForm, ChangePasswordForm, AddForm, CheckoutForm
+from utilityFunctions import initialize_db, dict_factory, db_connection, item_name_path, check_unique_email, calculate_new_price
 from classes.member import Member
 import datetime
 import time
@@ -26,55 +27,7 @@ def load_member(member_id):
     else:        
         return Member(int(row[0]), row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12])
 
-
-# Create our tables and insert a few entries
-def initialize_db():
-    with open('database.sql', 'r') as sql_file:
-        sql_script = sql_file.read()
-
-    conn = sqlite3.connect('sabs.db')
-    cursor = conn.cursor()
-    cursor.executescript(sql_script)
-    conn.commit()
-
-#Turn the results from the database into a dictionary
-def dict_factory(cursor, row):
-    d = {}
-    for idx, col in enumerate(cursor.description):
-        d[col[0]] = row[idx]
-    return d
-
-def db_connection():
-    conn = sqlite3.connect('sabs.db')
-    conn.row_factory = dict_factory
-
-    return conn
-
-def item_name_path(list_of_something):
-    # Create the path to display images
-    itemNamesList = []
-    for x in list_of_something:
-        name = "../static/images/"
-        name = name + str(x["itemName"]).replace(" ", "")
-        name = name + ".png"
-        itemNamesList.append(name)
-
-    return itemNamesList
-
-def check_unique_email(user_email):
-    conn = db_connection()
-    c = conn.cursor()
-
-    query = "SELECT email FROM member WHERE email = (?)"
-    c.execute(query, [user_email])
-
-    row = c.fetchone()
-    if row is None:
-        return True
-    else:
-        return False
-
-# Run initialize the db before the app starts running
+# Initialize the db before the app starts running
 initialize_db()
 
 @app.route("/")
@@ -101,7 +54,7 @@ def home():
     return render_template('home.html', items=items, item_names_list=itemNamesList, length=len(items))
 
 
-@app.route("/register", methods=['GET'])
+@app.route("/register", methods=['GET', 'POST'])
 def register():
 
     registration_form = RegistrationForm()
@@ -113,7 +66,8 @@ def register():
         conn = db_connection()
         c = conn.cursor()
 
-        points = 10
+        # Start the member off with a 1% discount
+        points = 1
         currentdate = str(datetime.date.today())
         companyName = 'SABS General Store'
 
@@ -140,6 +94,7 @@ def register():
         # Commit the changes
         conn.commit()
 
+        # Load the newly created member and redirect them to their profile
         new_member = load_member(c.lastrowid)
         login_user(new_member)
 
@@ -154,6 +109,7 @@ def login():
         return redirect(url_for('profile'))
 
     form = LoginForm()
+
     if form.validate_on_submit():
         conn = db_connection()
         c = conn.cursor()
@@ -170,7 +126,7 @@ def login():
             else:
                 flash(f'Incorrect email or password', '')
         else:
-            flash(f"Uh oh, looks like you are not a member!", "danger")
+            flash(f"Uh oh, looks like you are not a member! You must be a member to login", "danger")
 
     return render_template('login.html', title='Login', form=form)
 
@@ -224,11 +180,76 @@ def logout():
     flash(f'{name} has been logged out!', 'success')
     return redirect(url_for('home'))
 
-@app.route("/profile/checkout=success/customerReceipt", methods=['GET'])
+@app.route("/profile/checkout", methods=['GET', 'POST'])
 @login_required
-def customer_receipt():
-    return render_template('customerReceipt.html', title='Customer Receipt')
+def checkout():
 
+    checkout_form = CheckoutForm()
+
+    query = "SELECT * FROM cart, item WHERE objectID = itemID AND cartID = (?)"
+    
+    conn = db_connection()
+    c = conn.cursor()
+    c.execute(query, str(current_user.id))
+    
+    cart_info = c.fetchall()
+    new_prices = []
+    for item in cart_info:
+        # item_names.append(item["itemName"])
+        new_prices.append(calculate_new_price(current_user.points, float(item["price"]), item["discountPercent"]))
+
+    item_pictures_paths = item_name_path(cart_info)
+
+    if checkout_form.validate_on_submit():
+        item_stock = []
+        buys_table_updated = []
+        for item in cart_info:
+            receipt = "You have bought " + item["itemName"]
+            new_stock = item["stock"] - 1
+            item_stock.append([new_stock, item["objectID"]])
+
+            buys_table_updated.append([item["objectID"], 
+                                    item["itemName"],
+                                    item["brand"],
+                                    item["size"], 
+                                    item["price"], 
+                                    item["discountPercent"], 
+                                    str(current_user.id),
+                                    receipt,
+                                    str(datetime.date.today()),
+                                    item["cartID"]
+                                    ])
+        
+        # Update the member points
+        points_query = "UPDATE member SET points = (?) WHERE memberID = (?)"
+        if current_user.points == 10:
+            current_user.points = 0
+        else:
+            current_user.points = current_user.points + 1
+            
+        c.execute(points_query, (current_user.points, str(current_user.id)))
+        conn.commit()
+
+        # Update the stock of item purchased
+        stock_query = "UPDATE item SET stock = (?) WHERE itemID = (?)"
+        c.executemany(stock_query, item_stock)
+        conn.commit()
+
+        # Update the cart of member
+        delete_cart_items_query = "DELETE FROM cart WHERE cartID = (?)"
+        c.execute(delete_cart_items_query, str(current_user.id))
+        conn.commit()
+
+        # Update the 'buys' table
+        buys_table_update_query = "INSERT INTO buys VALUES (?,?,?,?,?,?,?,?,?,?)"
+        c.executemany(buys_table_update_query, buys_table_updated)
+        conn.commit()
+
+        flash(f"Items purchased! Thank you for shopping with us", "success")
+
+        return redirect(url_for('home'))
+
+    return render_template('checkout.html', new_prices=new_prices, checkout_form=checkout_form, item_pictures_paths=item_pictures_paths, cart_info=cart_info, length=len(cart_info), title='Checkout')
 
 @app.route("/profile/editInfo", methods=['GET', 'POST'])
 @login_required
@@ -289,7 +310,7 @@ def editInfo():
 @login_required
 def changePassword():
 
-    change_password_form = changePasswordForm()
+    change_password_form = ChangePasswordForm()
 
     if change_password_form.validate_on_submit():
 
@@ -299,7 +320,6 @@ def changePassword():
         query = "SELECT member_password FROM member WHERE memberID = (?)"
         c.execute(query, str(current_user.id))
         old_pass = c.fetchone()
-        print(old_pass)
         
         if pbkdf2_sha256.verify(change_password_form.old_password.data, old_pass["member_password"]):
         
@@ -331,9 +351,13 @@ def searchResults():
     c.execute(query, [user_query])
 
     matching_items = c.fetchall()
+
+    query = "SELECT COUNT(*) FROM item WHERE itemName LIKE (?)"
+    c.execute(query, [user_query])
+    num_results = int(c.fetchone())
     matching_items_images = item_name_path(matching_items)
 
-    return render_template('searchResults.html', matching_items=matching_items, matching_items_images=matching_items_images, length=len(matching_items), search_query=str(temp), title='Search results')
+    return render_template('searchResults.html', matching_items=matching_items, matching_items_images=matching_items_images, num_results=num_results, search_query=str(temp), title='Search results')
 
 @app.route("/ProductDescription/<itemID>")
 def show(itemID):
@@ -350,54 +374,34 @@ def show(itemID):
 @app.route("/cart", methods=['GET'])
 @login_required
 def cart():
-    conn = db_connection()
-    c = conn.cursor()
-    items_query = "SELECT * FROM cart WHERE cartID = (?)"
-    c.execute(items_query, str(current_user.id))
-    items = c.fetchall()
+    # conn = db_connection()
+    # c = conn.cursor()
+    # items_query = "SELECT * FROM cart WHERE cartID = (?)"
+    # c.execute(items_query, str(current_user.id))
+    # items = c.fetchall()
 
-    sum = 0
-    for x in items:
-        sum = sum + x['objectPrice'] 
+    # sum = 0
+    # for x in items:
+    #     sum = sum + x['objectPrice'] 
  
-    return render_template('cart.html', items = items, length = len(items), total = sum, title = 'cart')
+    # return render_template('cart.html', items = items, length = len(items), total = sum, title = 'cart')
+    return render_template('cart.html')
 
 
 @app.route('/cart/<int:itemID>')
 @login_required
 def add_to_cart(itemID):
-    conn = db_connection()
-    c = conn.cursor()
-    temp = str(itemID)
-    query = "SELECT * FROM item WHERE itemID = (?)"
-    c.execute(query, (temp,))
-    item = c.fetchone()
+    # conn = db_connection()
+    # c = conn.cursor()
+    # temp = str(itemID)
+    # query = "SELECT * FROM item WHERE itemID = (?)"
+    # c.execute(query, (temp,))
+    # item = c.fetchone()
 
-    query2 = "INSERT into cart VALUES (?, ?, ?, ?)"
-    c.execute(query2,(current_user.id,item['itemID'], item['itemName'], item['price']))
-    conn.commit()
+    # query2 = "INSERT into cart VALUES (?, ?, ?, ?)"
+    # c.execute(query2,(current_user.id,item['itemID'], item['itemName'], item['price']))
+    # conn.commit()
     return redirect(url_for('cart'))
-    
-
-
-@app.route("/add", methods=['GET', 'POST'])
-def add():
-    form = AddForm()
-
-    if form.validate_on_submit():
-        conn = sqlite3.connect('sabs.db')
-        c = conn.cursor()
-
-        try:
-            query = "Insert into items(itemid, itemName, brand, size, price, stock) VALUES (?, ?, ?, ?, ?, ?)"
-            c.execute(query, (form.itemid.data, form.itemName.data, form.brand.data, form.size.data, form.price.data, form.stock.data)) #Execute the query
-            conn.commit() #Commit the changes
-            flash(f'{form.itemName.data} added to database with the ID of {form.itemid.data}!', 'success')
-            return redirect(url_for('home'))
-        except:
-            flash(f'{form.itemName.data} failed to be added to the DB!', 'danger')
-
-    return render_template('add.html', title='Add', form=form)
 
 if __name__ == '__main__':
     app.run(debug=True)

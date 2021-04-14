@@ -152,13 +152,9 @@ CREATE TABLE cart
 ( 
     cartID INTEGER NOT NULL,
     objectID INTEGER NOT NULL,
-    objectName varchar(255),
-    objectPrice float NOT NULL,
   	CHECK(cartID > 0),
     FOREIGN KEY(cartID) REFERENCES member(memberID),
-    FOREIGN KEY(objectID) REFERENCES item(itemID),
-    FOREIGN KEY(objectName) REFERENCES item(itemName),
-    FOREIGN KEY(objectPrice) REFERENCES item(price)
+    FOREIGN KEY(objectID) REFERENCES item(itemID)
   		on delete CASCADE
 );
 
@@ -359,11 +355,11 @@ Insert into item values (21, 'Clipboard', 'Ready', '15x1x1', 5.99, 100, 0, 'Stat
 Insert into item values (22, 'Dryer - Large Metallic', 'GG', '256x256x256', 1599.99, 25, 10, 'Appliances', 'SABS General Store');
 Insert into item values (23, 'Stove - Gas', 'GG', '300x300x300', 1899.99, 25, 10, 'Appliances', 'SABS General Store');
 Insert into item values (24, 'Professional Size Basketball', 'Wilson', '20x20x20', 20.99, 100, 0, 'Sporting', 'SABS General Store');
-Insert into item values (25, 'Basketball Air Pump', 'Sony', '5x10x20', 15.99, 65, 0, 'Sporting', 'SABS General Store');
+Insert into item values (25, 'Basketball Air Pump', 'Wilson', '5x10x20', 15.99, 65, 0, 'Sporting', 'SABS General Store');
 
 /* Add cart to table */
-Insert into cart values (1, 25, 'Basketball Air Pump', 15.99);
-Insert into cart values(1, 9, 'Pencil Sharpener', 2.99);
+Insert into cart values (1, 25);
+Insert into cart values(1, 9);
 
 /* Add empWorks to table */
 Insert into empWorks values (1, 1, '2016-12-12');
