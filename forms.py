@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextField, RadioField, HiddenField, TextAreaField, SelectField,  IntegerField, DecimalField
 from wtforms.validators import DataRequired, Length, Email, EqualTo
-
+from utilityFunctions import db_connection
 
 class RegistrationForm(FlaskForm):
     firstName = StringField('First Name *', validators=[DataRequired(), Length(min=2, max=50)])
@@ -56,3 +56,18 @@ class CheckoutForm(FlaskForm):
     expiry_year = IntegerField('Expiry Year *', validators=[DataRequired()])
     card_cvv = IntegerField('CVV *', validators=[DataRequired()])
     place_order = SubmitField('Place Order')
+
+# TO DO: Receive all item names instead of connecting to db in forms to get all item names
+class AdminDeleteForm(FlaskForm):
+    conn = db_connection()
+    c = conn.cursor()
+    query = "SELECT itemID, itemName FROM item"
+    c.execute(query)
+    item_choices = []
+    items = c.fetchall()
+    for item in items:
+        item_choices.append(item["itemName"])
+
+    item_choices.sort()
+    item_options = SelectField('Delete Item', choices=item_choices)
+    delete = SubmitField('Delete Item')
