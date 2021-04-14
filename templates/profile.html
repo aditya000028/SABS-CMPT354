@@ -7,7 +7,7 @@
                 <hr>
             </div> 
         </div>
-        <div class="row">
+        <div class="row p-5">
             <div class="col">
                 <a class="btn btn-outline-primary p-4" href="{{ url_for('pastPurchases') }}">
                     <div class="row">
@@ -24,6 +24,18 @@
                     </div>
                 </a>
             </div>
+        </div>
+        <div class="row p-5">
+            {% if current_user.email == "SabsGeneralStore@gmail.com" %}
+                <div class="col">
+                    <a class="btn btn-outline-primary p-4" href="{{ url_for('adminDeleteItems') }}">
+                        <div class="row">
+                            <img class="img-fluid" width="50" height="50" style="float:left" src="../static/images/profile.png">
+                            Delete Items
+                        </div>
+                    </a>
+                </div>
+            {% endif %}
         </div>
     </div>
 {% endblock content %}

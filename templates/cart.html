@@ -13,8 +13,8 @@
             <div class="media-body">
                 <div class="article-metadata">
                 <div class="rectangle"></div>
-                <h6><a href='{{ url_for("show", itemID=items[x].objectID)}}'><b>{{ items[x].objectName }}</b></a></h6>
-                <p class="article-content"><b>price: </b>{{ items[x].objectPrice }}</p>
+                <h6><a href='{{ url_for("show", itemID=items[x].objectID)}}'><b>{{ items[x].itemName }}</b></a></h6>
+                <p class="article-content"><b>price: </b>{{ items[x].itemPrice }}</p>
             </div>
             <article>
         {% endfor %}

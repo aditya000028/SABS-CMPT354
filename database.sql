@@ -29,7 +29,6 @@ drop table if exists empWorks;
 drop table if exists storeHas;
 drop table if exists department;
 drop table if exists cart;
-drop table if exists objects;
 
 CREATE TABLE manager 
 (
@@ -49,7 +48,7 @@ CREATE TABLE employee
     lastName varchar(255) NOT NULL,
     startDate char(10) NOT NULL,
     email varchar(255) NOT NULL,
-    password varchar(255) NOT NULL,
+    employee_password text NOT NULL,
     FOREIGN KEY (managerID) REFERENCES manager(managerID)
         ON DELETE SET DEFAULT
   		ON UPDATE CASCADE,
@@ -98,11 +97,14 @@ CREATE TABLE member
     fname varchar(255) NOT NULL,
     lname varchar(255) NOT NULL,
     email varchar(255),
-    password varchar(255) NOT NULL,
+    member_password text NOT NULL,
     points INTEGER NOT NULL,
     registeredDate varchar(255) NOT NULL,
     companyName varchar(255) NOT NULL,
-    memberAddress varchar(255),
+    address_street varchar(255),
+    address_city char(2),
+    address_zip char(6),
+    address_province varchar(255),
     birthdate char(10),
   	CHECK(points >= 0),
     FOREIGN KEY(companyName) REFERENCES company(companyName)
@@ -115,9 +117,11 @@ CREATE TRIGGER validate_member_before_insert_member
 BEGIN
    SELECT
       CASE
-		WHEN NEW.email NOT LIKE '%_@__%.__%' THEN RAISE (ABORT,'Invalid email address')
-		WHEN NEW.birthdate NOT LIKE '____-__-__' THEN RAISE (ABORT,'Invalid birth date')
-        WHEN NEW.registeredDate NOT LIKE '____-__-__' THEN RAISE (ABORT,'Invalid registry date')
+		WHEN NEW.email NOT LIKE '%_@_%.__%' AND length(NEW.email) > 0 THEN RAISE (ABORT,'Invalid email address')
+		WHEN NEW.birthdate NOT LIKE '____-__-__' AND length(NEW.birthdate) > 0 THEN RAISE (ABORT,'Invalid birth date')
+    WHEN NEW.registeredDate NOT LIKE '____-__-__' THEN RAISE (ABORT,'Invalid registry date')
+    WHEN NEW.address_zip NOT LIKE '______' AND length(NEW.address_zip) > 0 THEN RAISE (ABORT,'Invalid zip code length')
+    WHEN NEW.address_province NOT LIKE '__' AND length(NEW.address_province) > 0 THEN RAISE (ABORT, 'Invalid province')
       END;
 END;
 
@@ -148,16 +152,11 @@ CREATE TABLE cart
 ( 
     cartID INTEGER NOT NULL,
     objectID INTEGER NOT NULL,
-    objectName varchar(255),
-    objectPrice float NOT NULL,
   	CHECK(cartID > 0),
     FOREIGN KEY(cartID) REFERENCES member(memberID),
-    FOREIGN KEY(objectID) REFERENCES item(itemID),
-    FOREIGN KEY(objectName) REFERENCES item(itemName),
-    FOREIGN KEY(objectPrice) REFERENCES item(price)
+    FOREIGN KEY(objectID) REFERENCES item(itemID)
   		on delete CASCADE
 );
-
 
 CREATE TABLE empWorks
 (
@@ -285,11 +284,11 @@ CREATE TABLE writes
 );
 
 /* Add members to database */
-Insert into member values (1, 'Bruce', 'Wayne', 'Batman@gmail.com', 'Batman', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', '1950-05-12');
-Insert into member values (2, 'Peter', 'Parker', 'Spiderman@gmail.com', 'Spidey', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', '1950-05-12');
-Insert into member values (3, 'Aubrey', 'Graham', 'Drake@gmail.com', 'Drake', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', '1950-05-12');
-Insert into member values (4, 'Steph', 'Curry', 'splash@gmail.com', 'Chef', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', '1950-05-12');
-Insert into member values (5, 'Elias', 'Pettersson', 'Petey@gmail.com', 'Petey', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', '1950-05-12');
+Insert into member values (1, 'Bruce', 'Wayne', 'Batman@gmail.com', 'Batman', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', 'Surrey', 'V9Y3Q1', 'BC', '1950-05-12');
+Insert into member values (2, 'Peter', 'Parker', 'Spiderman@gmail.com', 'Spidey', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', 'Vancouver', 'V9Y3Q1', 'BC', '1950-05-12');
+Insert into member values (3, 'Aubrey', 'Graham', 'Drake@gmail.com', 'Drake', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', 'Burnaby', 'V9Y3Q1', 'BC', '1950-05-12');
+Insert into member values (4, 'Steph', 'Curry', 'splash@gmail.com', 'Chef', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', 'Richmond', 'V9Y3Q1', 'BC', '1950-05-12');
+Insert into member values (5, 'Elias', 'Pettersson', 'Petey@gmail.com', 'Petey', 0, '1950-05-12', 'SABS General Store', '1234 ABC place', 'Toronto', 'V9Y3Q1', 'TO', '1950-05-12');
 
 /* Add managers into table */
 Insert into manager values (1, 'TempFirst', 'TempLast', 60000);
@@ -356,11 +355,11 @@ Insert into item values (21, 'Clipboard', 'Ready', '15x1x1', 5.99, 100, 0, 'Stat
 Insert into item values (22, 'Dryer - Large Metallic', 'GG', '256x256x256', 1599.99, 25, 10, 'Appliances', 'SABS General Store');
 Insert into item values (23, 'Stove - Gas', 'GG', '300x300x300', 1899.99, 25, 10, 'Appliances', 'SABS General Store');
 Insert into item values (24, 'Professional Size Basketball', 'Wilson', '20x20x20', 20.99, 100, 0, 'Sporting', 'SABS General Store');
-Insert into item values (25, 'Basketball Air Pump', 'Sony', '5x10x20', 15.99, 65, 0, 'Sporting', 'SABS General Store');
+Insert into item values (25, 'Basketball Air Pump', 'Wilson', '5x10x20', 15.99, 65, 0, 'Sporting', 'SABS General Store');
 
 /* Add cart to table */
-Insert into cart values (1, 25, 'Basketball Air Pump', 15.99);
-Insert into cart values(1, 9, 'Pencil Sharpener', 2.99);
+Insert into cart values (1, 25);
+Insert into cart values(1, 9);
 
 /* Add empWorks to table */
 Insert into empWorks values (1, 1, '2016-12-12');
