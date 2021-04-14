@@ -34,8 +34,6 @@ initialize_db()
 @app.route("/home")
 def home():
     query = "SELECT * FROM item"
-    if ('brand' in request.args and  request.args.get('brand', type=str) != ""):
-        query = "SELECT * FROM item WHERE brand=\"" + request.args.get('brand', type=str) + '\"'
 
     conn = db_connection()
     c = conn.cursor()
