@@ -1,6 +1,161 @@
 {% extends "layout.html" %}
 {% block content %}
-    <div class="container">
-        <h1>Shipping Address</h1>
+
+    <div class="content-section">
+        <form method="POST" action="" class="">
+            {{ checkout_form.hidden_tag() }}
+            <fieldset class="form-group">
+                <h2>Your Items</h2>
+                <div class="form-group">
+                    {% for x in range(length) %}
+                    <hr>
+                    <div class="border border-dark">
+                        <div class="row bg-dark text-white m-2 p-4">
+                            <div class="col">
+                                Price: ${{ new_prices[x][0] }}
+                                Discount Percent: %{{ new_prices[x][1] }}
+                                Price after applying discount and your points: ${{ new_prices[x][2] }}
+                            </div>
+                        </div>
+                        <div class="row m-2 p-4">
+                            <div class="col">
+                                <a href="#">
+                                    <img src={{item_pictures_paths[x]}} style="width:50%;height:auto;">
+                                </a>
+                            </div>
+                            <div class="col">
+                                <a href="#">
+                                    <h3>{{ cart_info[x].itemName }}</h3>
+                                </a>
+                                <h6>{{ cart_info[x].brand }}</h6>
+                                <h6>{{ cart_info[x].size }}</h6>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% endfor %}
+                </div>
+                <h2>Shipping Address</h2>
+                <hr>
+                <div class="form-group">
+                    {{ checkout_form.street_address.label(class="form-control-label") }}
+
+                    {% if checkout_form.street_address.errors %}
+                        {{ checkout_form.street_address(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in checkout_form.street_address.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ checkout_form.street_address(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ checkout_form.province.label(class="form-control-label") }}
+
+                    {% if checkout_form.province.errors %}
+                        {{ checkout_form.province(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in checkout_form.province.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ checkout_form.province(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ checkout_form.city.label(class="form-control-label") }}
+
+                    {% if checkout_form.city.errors %}
+                        {{ checkout_form.city(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in checkout_form.city.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ checkout_form.city(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ checkout_form.zip_code.label(class="form-control-label") }}
+
+                    {% if checkout_form.zip_code.errors %}
+                        {{ checkout_form.zip_code(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in checkout_form.zip_code.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ checkout_form.zip_code(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>   
+                <hr>
+                <h2>Payment Details</h2>
+                <hr>
+                <div class="form-group">
+                    {{ checkout_form.card_number.label(class="form-control-label") }}
+
+                    {% if checkout_form.card_number.errors %}
+                        {{ checkout_form.card_number(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in checkout_form.card_number.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ checkout_form.card_number(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>   
+                <div class="form-group">
+                    {{ checkout_form.expiry_month.label(class="form-control-label") }}
+
+                    {% if checkout_form.expiry_month.errors %}
+                        {{ checkout_form.expiry_month(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in checkout_form.expiry_month.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ checkout_form.expiry_month(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>   
+                <div class="form-group">
+                    {{ checkout_form.expiry_year.label(class="form-control-label") }}
+
+                    {% if checkout_form.expiry_year.errors %}
+                        {{ checkout_form.expiry_year(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in checkout_form.expiry_year.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ checkout_form.expiry_year(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>   
+                <div class="form-group">
+                    {{ checkout_form.card_cvv.label(class="form-control-label") }}
+
+                    {% if checkout_form.card_cvv.errors %}
+                        {{ checkout_form.card_cvv(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in checkout_form.card_cvv.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ checkout_form.card_cvv(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>     
+            </fieldset>
+            <div class="form-group">
+                {{ checkout_form.place_order(class="btn btn-primary") }}
+            </div>
+        </form>
     </div>
-{% endblock %}
+{% endblock content %}
