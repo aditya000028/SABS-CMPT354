@@ -1,6 +1,6 @@
 .vscode
 venv/
 .DS_Store
-__pycache__
-classes\__pycache__
+__pycache__/
+classes/__pycache__
 sabs.db
