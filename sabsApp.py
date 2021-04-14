@@ -395,34 +395,35 @@ def show(itemID):
 @app.route("/cart", methods=['GET'])
 @login_required
 def cart():
-    # conn = db_connection()
-    # c = conn.cursor()
-    # items_query = "SELECT * FROM cart WHERE cartID = (?)"
-    # c.execute(items_query, str(current_user.id))
-    # items = c.fetchall()
-
-    # sum = 0
-    # for x in items:
-    #     sum = sum + x['objectPrice'] 
+     conn = db_connection()
+     c = conn.cursor()
+     items_query = "SELECT * FROM cart,item WHERE cartID = (?) AND item.itemID IN( SELECT itemID FROM item WHERE itemID = objectID)"
+     c.execute(items_query, str(current_user.id))
+     items = c.fetchall()
+     print(items)
+     
+     sum = 0
+     for x in items:
+         sum = sum + x['price'] 
  
-    # return render_template('cart.html', items = items, length = len(items), total = sum, title = 'cart')
-    return render_template('cart.html')
+     return render_template('cart.html', items = items, length = len(items), total = sum, title = 'cart')
+     
 
 
 @app.route('/cart/<int:itemID>')
 @login_required
 def add_to_cart(itemID):
-    # conn = db_connection()
-    # c = conn.cursor()
-    # temp = str(itemID)
-    # query = "SELECT * FROM item WHERE itemID = (?)"
-    # c.execute(query, (temp,))
-    # item = c.fetchone()
+     conn = db_connection()
+     c = conn.cursor()
+     temp = str(itemID)
+     query = "SELECT * FROM item WHERE itemID = (?)"
+     c.execute(query, (temp,))
+     item = c.fetchone()
 
-    # query2 = "INSERT into cart VALUES (?, ?, ?, ?)"
-    # c.execute(query2,(current_user.id,item['itemID'], item['itemName'], item['price']))
-    # conn.commit()
-    return redirect(url_for('cart'))
+     query2 = "INSERT into cart VALUES (?, ?)"
+     c.execute(query2,(current_user.id,item['itemID']))
+     conn.commit()
+     return redirect(url_for('cart'))
 
 if __name__ == '__main__':
     app.run(debug=True)
