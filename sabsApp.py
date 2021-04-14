@@ -1,6 +1,6 @@
 from flask import Flask, render_template, url_for, flash, redirect, request, Response
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
-from forms import RegistrationForm, LoginForm, TimeSelectForm, EditInformationForm, ChangePasswordForm, AddForm, CheckoutForm
+from forms import RegistrationForm, LoginForm, TimeSelectForm, EditInformationForm, ChangePasswordForm, AddForm, CheckoutForm, AdminDeleteForm
 from utilityFunctions import initialize_db, dict_factory, db_connection, item_name_path, check_unique_email, calculate_new_price
 from classes.member import Member
 import datetime
@@ -166,11 +166,32 @@ def pastPurchases():
 
     return render_template('pastPurchases.html', purchases=purchases, itemImgPath=itemImgPath, length=len(purchases),  form=form, title='Past Purchases')
 
-
 @app.route("/profile", methods=['GET', 'POST'])
 @login_required
 def profile():
     return render_template('profile.html', title='Profile')
+
+# Since flask does not support different types of user logins, if a user is signed up
+# using the sabs email, they will be able to delete forms
+# this is to satisfy the assignment requirement 'delete operation with cascade'
+@app.route("/profile/adminDeleteItems", methods=['GET', 'POST'])
+@login_required
+def adminDeleteItems():
+
+    if current_user.email == "SabsGeneralStore@gmail.com":
+        form = AdminDeleteForm()
+        if form.is_submitted():
+            conn = db_connection()
+            c = conn.cursor()
+            query = "DELETE FROM item WHERE itemName = (?)"
+            c.execute(query, [form.item_options.data])
+            conn.commit()
+            flash(f"The item '{form.item_options.data}' has been deleted", "info")
+    else:
+        flash(f"You do not have permission to access this page", "info")
+        return redirect(url_for('profile'))
+
+    return render_template('adminDeleteItems.html', form=form, title='Delete Items')
 
 @app.route("/logout")
 @login_required

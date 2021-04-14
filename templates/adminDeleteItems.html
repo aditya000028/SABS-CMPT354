@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="container">
+        {% if current_user.email == "SabsGeneralStore@gmail.com" %}
+        <div class="row">
+            <div class="col">
+                <div class="content-section">
+                    <form method="POST" action="" class="">
+                        
+                        <fieldset class="form-group">
+                            <h2>Delete an Item</h2>
+                            <div class="form-group">
+                                {% if form.item_options.errors %}
+                                    {{ form.item_options(class="form-control form-control-lg is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.item_options.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.item_options(class="form-control form-control-lg") }}
+                                {% endif %}
+                            </div>
+                        </fieldset>
+                        <div class="form-group">
+                            {{ form.delete(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+{% endblock content %}
