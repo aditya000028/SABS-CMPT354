@@ -166,14 +166,14 @@ def pastPurchases():
 
     return render_template('pastPurchases.html', purchases=purchases, itemImgPath=itemImgPath, length=len(purchases),  form=form, title='Past Purchases')
 
-# Since flask does not support different types of user logins, if a user is signed up
-# using the sabs email, they will be able to delete forms
-# this is to satisfy the assignment requirement 'delete operation with cascade'
 @app.route("/profile", methods=['GET', 'POST'])
 @login_required
 def profile():
     return render_template('profile.html', title='Profile')
 
+# Since flask does not support different types of user logins, if a user is signed up
+# using the sabs email, they will be able to delete forms
+# this is to satisfy the assignment requirement 'delete operation with cascade'
 @app.route("/profile/adminDeleteItems", methods=['GET', 'POST'])
 @login_required
 def adminDeleteItems():
