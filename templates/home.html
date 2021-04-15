@@ -8,9 +8,9 @@
         <h6 class="p-1 border-bottom">Department</h6>
           <div class="list-group" id="deparmentgroup">
             <a class="list-group-item list-group-item-action mb-2 rounded" id="*" data-toggle="list">Any</a>
-            {% for x in departments }
-              <a class="list-group-item list-group-item-action mb-2 rounded" id="{{ x.department }}" data-toggle="list">{{ x.department }}</a>
-            {% endfor }
+            {% for x in departments %}
+              <a class="list-group-item list-group-item-action mb-2 rounded" id="{{ x.depName }}" data-toggle="list">{{ x.depName }}</a>
+            {% endfor %}
           </div>
       </div>
     <div>
@@ -26,9 +26,9 @@
         <div id="brandsgroup" class="collapse">
             <div class="list-group" id="brandsgroupinner">
               <a class="list-group-item list-group-item-action mb-2 rounded" id="*" data-toggle="list">Any</a>
-              {% for x in brands }
+              {% for x in brands %}
                 <a class="list-group-item list-group-item-action mb-2 rounded" id="{{ x.brand }}" data-toggle="list">{{ x.brand }}</a>
-              {% endfor }
+              {% endfor %}
             </div>
         </ul>
         </div>

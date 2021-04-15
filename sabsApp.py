@@ -48,10 +48,16 @@ def home():
         # this sucks
         if (brand != '*' and department == "*" and stock == "false"):
             query = ("SELECT * FROM item WHERE brand =\'%s\';" % (brand))
-        else if (brand == '*' and department != "*" and stock == "false"):
-            query = ("SELECT * FROM item WHERE department =\'%s\';" % (department))
-        else if (brand != '*' and department != "*" and stock == "false"):
-            query = ("SELECT * FROM item WHERE department =\'%s\'AND brand =\'%s\';" % (department, brand))
+        elif (brand == '*' and department != "*" and stock == "false"):
+            query = ("SELECT * FROM item WHERE depName =\'%s\';" % (department))
+        elif (brand != '*' and department != "*" and stock == "false"):
+            query = ("SELECT * FROM item WHERE depName =\'%s\'AND brand =\'%s\';" % (department, brand))
+        elif (brand != '*' and department == "*" and stock == "true"):
+            query = ("SELECT * FROM item WHERE brand =\'%s\' AND stock >= 1;" % (brand))
+        elif (brand == '*' and department != "*" and stock == "true"):
+            query = ("SELECT * FROM item WHERE depName =\'%s\' AND stock >= 1;" % (department))
+        elif (brand != '*' and department != "*" and stock == "true"):
+            query = ("SELECT * FROM item WHERE depName =\'%s\'AND brand =\'%s\' AND stock >= 1;" % (department, brand))
         else:
             query = "SELECT * FROM item"
     else:
@@ -72,7 +78,13 @@ def home():
         name = name + ".png"
         x['image'] = name
 
-    return render_template('home.html', items=items)
+    c.execute("SELECT * FROM item GROUP BY brand")
+    brands = c.fetchall()
+
+    c.execute("SELECT * FROM item GROUP BY depName")
+    departments = c.fetchall()
+
+    return render_template('home.html', items=items, brands = brands, departments = departments)
 
 
 @app.route("/register", methods=['GET', 'POST'])
