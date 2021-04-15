@@ -61,12 +61,40 @@
         </div>
       </div>
     </main>
-
-
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <!-- there was no other place to put it -->
+    <script>
+      function getFilters() {
+        var activeDepartment = '*'
+        var activeBrand = '*'
+        var activeSize = '*'
+        if ((document.querySelector("#deparmentgroup").getElementsByClassName("list-group-item active")).length >= 1){
+          activeDepartment = document.querySelector("#deparmentgroup").getElementsByClassName("list-group-item active")[0].id;
+        }
+        if ((document.querySelector("#brandsgroupinner").getElementsByClassName("list-group-item active")).length >= 1){
+          activeBrand = document.querySelector("#brandsgroupinner").getElementsByClassName("list-group-item active")[0].id;
+        }
+        if ((document.querySelector("#sizesgroupinner").getElementsByClassName("list-group-item active")).length >= 1){
+          activeSize = document.querySelector("#sizesgroupinner").getElementsByClassName("list-group-item active")[0].id;
+        }
+        var inStock = document.querySelector("#instockcheck").checked;
+        var data = {};
+        data.department = activeDepartment;
+        data.brand = activeBrand;
+        data.size = activeSize;
+        data.stock = inStock;
+
+        $.post( "home", {
+          javascript_data: data
+        }, function( response ) {
+          $("body").html(response);
+       });
+      }
+    </script>
 </body>
 </html>

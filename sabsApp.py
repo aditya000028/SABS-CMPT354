@@ -4,6 +4,7 @@ from forms import RegistrationForm, LoginForm, TimeSelectForm, EditInformationFo
 from utilityFunctions import initialize_db, dict_factory, db_connection, item_name_path, check_unique_email, calculate_new_price
 from classes.member import Member
 import datetime
+import json
 import time
 import sqlite3
 from passlib.hash import pbkdf2_sha256
@@ -30,10 +31,33 @@ def load_member(member_id):
 # Initialize the db before the app starts running
 initialize_db()
 
+
+
+
+
 @app.route("/")
-@app.route("/home")
+@app.route("/home", methods = ['GET', 'POST'])
 def home():
-    query = "SELECT * FROM item"
+    if (request.method == 'POST'):
+        department = request.form['javascript_data[department]']
+        brand = request.form['javascript_data[brand]']
+        stock = request.form['javascript_data[stock]']
+        size = request.form['javascript_data[size]']
+        print(stock)
+
+        # this sucks
+        if (brand != '*' and department == "*" and stock == "false"):
+            query = ("SELECT * FROM item WHERE brand =\'%s\';" % (brand))
+        else if (brand == '*' and department != "*" and stock == "false"):
+            query = ("SELECT * FROM item WHERE department =\'%s\';" % (department))
+        else if (brand != '*' and department != "*" and stock == "false"):
+            query = ("SELECT * FROM item WHERE department =\'%s\'AND brand =\'%s\';" % (department, brand))
+        else:
+            query = "SELECT * FROM item"
+    else:
+        query = "SELECT * FROM item"
+
+    print(query)
 
     conn = db_connection()
     c = conn.cursor()
