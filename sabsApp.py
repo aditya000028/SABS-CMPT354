@@ -1,13 +1,15 @@
 from flask import Flask, render_template, url_for, flash, redirect, request, Response
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
-from forms import RegistrationForm, LoginForm, TimeSelectForm, EditInformationForm, ChangePasswordForm, AddForm, CheckoutForm
-#, AdminDeleteForm
+from forms import RegistrationForm, LoginForm, TimeSelectForm, EditInformationForm, ChangePasswordForm, AddForm, CheckoutForm, AdminDeleteForm
 from utilityFunctions import initialize_db, dict_factory, db_connection, item_name_path, check_unique_email, calculate_new_price
 from classes.member import Member
 import datetime
 import time
 import sqlite3
 from passlib.hash import pbkdf2_sha256
+
+# Initialize the db before the app starts running
+initialize_db()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
@@ -27,9 +29,6 @@ def load_member(member_id):
         return None
     else:        
         return Member(int(row[0]), row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12])
-
-# Initialize the db before the app starts running
-initialize_db()
 
 @app.route("/")
 @app.route("/home")
