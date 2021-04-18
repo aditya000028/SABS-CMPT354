@@ -1,6 +1,7 @@
 from flask import Flask, render_template, url_for, flash, redirect, request, Response
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
-from forms import RegistrationForm, LoginForm, TimeSelectForm, EditInformationForm, ChangePasswordForm, AddForm, CheckoutForm, AdminDeleteForm
+from forms import RegistrationForm, LoginForm, TimeSelectForm, EditInformationForm, ChangePasswordForm, AddForm, CheckoutForm
+#, AdminDeleteForm
 from utilityFunctions import initialize_db, dict_factory, db_connection, item_name_path, check_unique_email, calculate_new_price
 from classes.member import Member
 import datetime
@@ -400,13 +401,14 @@ def cart():
      items_query = "SELECT * FROM cart,item WHERE cartID = (?) AND item.itemID IN( SELECT itemID FROM item WHERE itemID = objectID)"
      c.execute(items_query, str(current_user.id))
      items = c.fetchall()
-     print(items)
+     #print(items)
+     matching_items_images = item_name_path(items)
      
      sum = 0
      for x in items:
          sum = sum + x['price'] 
  
-     return render_template('cart.html', items = items, length = len(items), total = sum, title = 'cart')
+     return render_template('cart.html', items = items, matching_items_images = matching_items_images, length = len(items), total = sum, title = 'cart')
      
 
 
@@ -424,6 +426,27 @@ def add_to_cart(itemID):
      c.execute(query2,(current_user.id,item['itemID']))
      conn.commit()
      return redirect(url_for('cart'))
+
+@app.route('/home/<int:itemID>')
+@login_required
+def remove_from_cart(itemID):
+     conn = db_connection()
+     c = conn.cursor()
+     temp = str(itemID)
+     query = "DELETE FROM cart WHERE cartID = (?) AND objectID = (?)"
+     c.execute(query,(current_user.id,temp))
+     conn.commit()
+
+     items_query = "SELECT * FROM cart,item WHERE cartID = (?) AND item.itemID IN( SELECT itemID FROM item WHERE itemID = objectID)"
+     c.execute(items_query, str(current_user.id))
+     items = c.fetchall()
+     matching_items_images = item_name_path(items)
+     
+     sum = 0
+     for x in items:
+         sum = sum + x['price'] 
+     return render_template('cart.html', items = items, matching_items_images = matching_items_images, length = len(items), total = sum, title = 'cart')
+
 
 if __name__ == '__main__':
     app.run(debug=True)

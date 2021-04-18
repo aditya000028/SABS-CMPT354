@@ -58,16 +58,16 @@ class CheckoutForm(FlaskForm):
     place_order = SubmitField('Place Order')
 
 # TO DO: Receive all item names instead of connecting to db in forms to get all item names
-class AdminDeleteForm(FlaskForm):
-    conn = db_connection()
-    c = conn.cursor()
-    query = "SELECT itemID, itemName FROM item"
-    c.execute(query)
-    item_choices = []
-    items = c.fetchall()
-    for item in items:
-        item_choices.append(item["itemName"])
+#class AdminDeleteForm(FlaskForm):
+#    conn = db_connection()
+#    c = conn.cursor()
+#    query = "SELECT itemID, itemName FROM item"
+#    c.execute(query)
+#    item_choices = []
+#    items = c.fetchall()
+#    for item in items:
+#        item_choices.append(item["itemName"])
 
-    item_choices.sort()
-    item_options = SelectField('Delete Item', choices=item_choices)
-    delete = SubmitField('Delete Item')
+#    item_choices.sort()
+#    item_options = SelectField('Delete Item', choices=item_choices)
+#    delete = SubmitField('Delete Item')

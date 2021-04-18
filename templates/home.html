@@ -66,7 +66,7 @@
               <p><b>Dimensions:</b> {{ x.size }}</p>
               <p><b>In Stock:</b> {{ x.stock }}</p>
               <a href='{{ url_for("show", itemID=x.itemID) }}'>Product Description</a>
-              <a href='{{ url_for("add_to_cart", itemID=x.itemID) }}'><b>Add to Cart</b></a>
+              <a class= "btn btn-primary" href='{{ url_for("add_to_cart", itemID=x.itemID) }}'><b>Add to Cart</b></a>
             </div>
           </div>
         {% endfor %}
