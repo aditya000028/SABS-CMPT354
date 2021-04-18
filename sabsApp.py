@@ -388,9 +388,57 @@ def show(itemID):
     query = "SELECT * FROM item WHERE itemID = (?)"
     c.execute(query, (temp,))
     item = c.fetchone()
-    return render_template('ProductDescription.html', item =item, title = 'Description' )
 
+    query = "SELECT rating, content FROM review WHERE itemID = (?)"
+    c.execute(query, (temp,))
+    reviews = c.fetchall()
 
+    name = "../static/images/"
+    name = name + str(item["itemName"]).replace(" ", "")
+    name = name + ".png"
+    item['image'] = name
+
+    return render_template('ProductDescription.html', item =item, title = 'Description', itemID = itemID, reviews = reviews, reviewsLen = len(reviews))
+
+@app.route('/submit/<itemID>', methods=['POST'])
+@login_required
+def submit(itemID):
+    conn = db_connection()
+    c = conn.cursor()
+    temp = str(itemID)
+    query = "SELECT COUNT(reviewNumber) FROM review"
+    c.execute(query, ())
+    numberOfReviews = c.fetchone()
+    numberOfReviews = numberOfReviews['COUNT(reviewNumber)']
+
+    query = "SELECT * FROM item WHERE itemID = (?)"
+    c.execute(query, (temp,))
+    item = c.fetchone()
+
+    review_query = "SELECT rating, content FROM review WHERE itemID = (?)"
+    c.execute(review_query, (temp,))
+    reviews = c.fetchall()
+
+    tempMember = current_user.id
+    query = "SELECT memberID FROM review WHERE memberID = (?) AND itemID = (?)"
+    c.execute(query, (tempMember, temp,))
+    memberIDArr = c.fetchall()
+    
+    if (len(memberIDArr) == 0):
+        query = "INSERT into review VALUES(?, ?, ?, ?, ?)"
+        c.execute(query, (numberOfReviews + 1, itemID, current_user.id, request.form['rating'], request.form['content']))
+        conn.commit()
+
+    review_query = "SELECT rating, content FROM review WHERE itemID = (?)"
+    c.execute(review_query, (temp,))
+    reviews = c.fetchall()
+
+    name = "../static/images/"
+    name = name + str(item["itemName"]).replace(" ", "")
+    name = name + ".png"
+    item['image'] = name
+
+    return render_template('ProductDescription.html', item =item, title = 'Description', itemID = itemID, reviews = reviews, reviewsLen = len(reviews))
 
 @app.route("/cart", methods=['GET'])
 @login_required
