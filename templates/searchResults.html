@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block content %}
+    {% if length == 0 %}
+    <p>There are 0 results for your search. Try using different keywords</p>
+    {% else %}
+        {% for x in range(length) %}
+            <article class="media">
+            <div class="media-body">
+                <div class="article-metadata">
+                    <p>Your search for <b>'{{ search_query }}'</b> yielded <b>{{ num_results }}</b> result(s)</p>
+                <div class="rectangle"></div>
+                <h2><a class="article-title" href="#">{{ matching_items[x].itemName }}</a></h2>
+                <p class="article-content" id="price"><b>{{ matching_items[x].price }}</b></p>
+                <p class="article-content"><b>Brand:</b>{{ matching_items[x].brand }}</p>
+                <p class="article-content"><b>Dimensions:</b>{{ matching_items[x].size }}</p>
+                <p class="article-content"><b>In Stock:</b>{{ matching_items[x].stock }}</p>
+                <img src={{matching_items_images[x]}}>
+            </div>
+            <article>
+        {% endfor %}
+    {% endif %}
+{% endblock content %}

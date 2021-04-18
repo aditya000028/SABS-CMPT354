@@ -1,0 +1,40 @@
+
+
+{% extends "layout.html" %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h1>{{ current_user.fname }}'s cart</h1>
+                <hr>
+            </div> 
+        </div>
+        <div class="row">
+            {% for x in range(length) %}
+            <article class="media">
+            <div class="media-body">
+                <div class="article-metadata">
+                <div class="rectangle"></div>
+                <h6><a href='{{ url_for("show", itemID=items[x].objectID)}}'><b>{{ items[x].itemName }}</b></a></h6>
+                <img class="img-fluid w-50 ml-lg-5 order-1 or-lg-2" id="productpicture" src={{matching_items_images[x]}}>
+                <p><b>price: </b>{{ items[x].price }}</p>
+                <a class ="btn btn-primary" href='{{ url_for("remove_from_cart", itemID=items[x].itemID) }}'>Remove from Cart</a>
+                <br>
+                <br>
+            </div>
+            <article>
+        {% endfor %}
+        <br>
+        <br>
+        <div class="boxed">
+        <h6>Your total is: {{total}}</h6>
+        <h5><a class="btn btn-secondary"href='{{ url_for("home")}}'><b>Keep Shopping</b></a></h5>
+        <h5><a class="btn btn-secondary"href='{{ url_for("checkout")}}'><b>Checkout</b></a></h5>
+        </div>
+        </div>
+        
+    </div>
+{% endblock content %}
+
+
+

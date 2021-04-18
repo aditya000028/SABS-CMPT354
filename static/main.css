@@ -24,55 +24,6 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
 }
 
-.content-section {
-  background: #ffffff;
-  padding: 10px 20px;
-  border: 1px solid #dddddd;
-  border-radius: 25px;
-  margin-bottom: 20px;
-  margin-left: 200px;
-  width: 100%;
-}
-
-.article-title {
-  color: #444444;
-  text-align: center;
-}
-
-a.article-title:hover {
-  color: #428bca;
-  text-decoration: none;
-}
-
-.article-content {
-  white-space: pre-line;
-  text-align: center;
-  margin-bottom: 0px;
-}
-
-.article-img {
-  height: 65px;
-  width: 65px;
-  margin-right: 16px;
-}
-
-.article-metadata {
-  padding-bottom: 1px;
-  margin-bottom: 4px;
-  border-bottom: 1px solid #e3e3e3
-}
-
-.article-metadata a:hover {
-  color: #333;
-  text-decoration: none;
-}
-
-.article-svg {
-  width: 25px;
-  height: 25px;
-  vertical-align: middle;
-}
-
 .account-img {
   height: 125px;
   width: 125px;
@@ -84,27 +35,85 @@ a.article-title:hover {
   font-size: 2.5rem;
 }
 
-.media {
-  height: 390px;
-  width: 50%;
+#itemname{
+  color: #444444;
+  text-decoration: none;
+}
+
+#productpicture {
+  max-height: 365px;
+  max-width: 400px;
   border: 10px solid #dddddd;
   border-radius: 25px;
   text-align: center;
   margin-bottom: 20px;
 }
 
-#price {
+#itemprice {
   border: 5px solid #dddddd;
   width: 50%;
-  margin-left: 87.5px;
   margin-bottom: 10px;
 }
 
-.rectangle {
-  height: 150px;
-  width: 50%;
-  margin-left: 87.5px;
-  border: 3px solid #dddddd;
+.minus-button {
+  border-radius: 10px 0px 0px 10px;
+}
+
+.plus-button {
+  border-radius: 0px 10px 10px 0px;
+}
+
+.prodDescription-add-to-cart {
+  border-radius: 10px 10px 10px 10px;
+}
+
+.quantity-selector {
+  text-align: center;
+}
+
+.prodDescriptionPrice {
+  color: green;
+  font-size: 200%;
+}
+
+.item-description {
+  margin-left: 100px;
+  margin-top: 50px;
+}
+
+.payment-div {
+  margin-left: 40px;
+  margin-top: 50px;
+  border: 2px solid #000000;
   border-radius: 25px;
-  margin-top: 25px;
+  border-spacing: 15px;
+  border-collapse: separate;
+  text-align: center;
+}
+
+.prodDescription-add-to-cart {
+  border-radius: 10px 10px 10px 10px;
+  margin-top: 30px;
+}
+
+.prodDescription-order-now {
+  border-radius: 10px 10px 10px 10px;
+  margin-top: 30px;
+}
+
+.reviews-div {
+  width: 100%;
+  position: absolute;
+  margin-top: 400px;
+}
+
+.review-body {
+  border: 2px solid #dddddd;
+  border-radius: 25px;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+#review-textbox {
+  width: 100%;
 }

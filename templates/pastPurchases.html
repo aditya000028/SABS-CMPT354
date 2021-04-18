@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="container">
+        <form method="POST" action="" id="TimeForm" onchange="SubmitTimeSelect()">
+            <div class="row">
+                <p class="font-weight-bold">{{ length }} item(s) purchased</p>
+                {{ form.hidden_tag() }}
+                {% for subfield in form.timeInput %}
+                        <div class="col">
+                            {{ subfield }}
+                            {{ subfield.label }}
+                        </div>
+                {% endfor %}
+            </div>
+        </form>
+        {% for x in range(length) %}
+            <div class="border border-dark">
+                <div class="row bg-dark text-white m-2 p-4">
+                    <div class="col">
+                        Price: ${{ purchases[x].price }}
+                        Discount Percent: %{{ purchases[x].discountPercent }}
+                    </div>
+                    <div class="col">
+                        Time of Purchase: {{ purchases[x].date_of_purchase }}
+                    </div>
+                </div>
+                <div class="row m-2 p-4">
+                    <div class="col">
+                        <a href="#">
+                            <img src={{itemImgPath[x]}} style="width:50%;height:auto;">
+                        </a>
+                    </div>
+                    <div class="col">
+                        <a href="#">
+                            <h3>{{ purchases[x].itemName }}</h3>
+                        </a>
+                        <h6>{{ purchases[x].brand }}</h6>
+                        <h6>{{ purchases[x].size }}</h6>
+                    </div>
+                    <div class="col">
+                        <h3>Access Receipt</h3>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        function SubmitTimeSelect() {
+            document.getElementById("TimeForm").submit()
+        }
+    </script>
+
+{% endblock %}
