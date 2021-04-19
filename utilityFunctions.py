@@ -1,4 +1,5 @@
 import sqlite3
+from collections import Counter
 
 # Create our tables and insert a few entries
 def initialize_db():
@@ -60,3 +61,18 @@ def calculate_new_price(user_points, current_price, discount_percent):
         new_price = current_price - (current_price * (float(discount_percent/100)) )
     return [current_price, discount_percent, new_price]
 
+def new_stock(items):
+    item_names = []
+    for item in items:
+        item_names.append(item["itemName"])
+    
+    unique = []
+    num_items_each = Counter(item_names)
+
+    for item in items:
+        if [(item["stock"] - num_items_each[item["itemName"]]), item["itemID"]] in unique:
+            continue
+        else:
+            unique.append([(item["stock"] - num_items_each[item["itemName"]]), item["itemID"]])
+
+    return unique

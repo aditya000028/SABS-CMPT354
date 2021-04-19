@@ -381,10 +381,12 @@ Insert into review values (2, 2, 2, 5, 'The Red pens 8-pack writes pretty good. 
 Insert into review values (3, 3, 3, 3, 'This bubblegum tastes disgusting');
 Insert into review values (4, 4, 4, 4, 'COD really picked it up this year');
 Insert into review values (5, 5, 5, 5, 'Best console ever');
-Insert into review values (6, 20, 5, 5, 'Best ');
-Insert into review values (7, 20, 5, 5, 'Best console');
-Insert into review values (8, 20, 5, 5, 'Best console ever');
-Insert into review values (9, 20, 5, 5, 'Best console ever');
+Insert into review values (6, 6, 6, 3, 'Hold an ok amount of water');
+Insert into review values (7, 7, 7, 5, 'Keeps my hands lotiony');
+Insert into review values (8, 8, 8, 2, 'Doesnt keep my armpits smelling fresh');
+Insert into review values (9, 9, 9, 5, 'Pencil is nice and pointy now');
+Insert into review values (11, 11, 11, 5, 'amazing tv with clear images');
+Insert into review values (20, 20, 20, 1, 'These taste terrible. Never buy them!!!');
 
 /* Add manages to table */
 Insert into manages values (1, 1);

@@ -60,12 +60,12 @@
           <div class="container-fluid media align-items-lg-center pt-5">
             <img class="img-fluid w-50 ml-lg-5 order-1 or-lg-2" id="productpicture" src={{x.image}}>
             <div class="media-body order-2 order-lg-1 pl-5">
-              <h2><a id="itemname" href="#">{{ x.itemName }}</a></h2>
-              <p id="itemprice"><b> {{ x.price }}</b></p>
+              <h2><a href='{{ url_for("show", itemID=x.itemID) }}'>{{ x.itemName }}</a></h2>
+              <p><b> {{ x.price }}</b></p>
+              <p><b>Discount Percent: </b>%{{ x.discountPercent }}</p>
               <p><b>Brand:</b> {{ x.brand }}</p>
               <p><b>Dimensions:</b> {{ x.size }}</p>
               <p><b>In Stock:</b> {{ x.stock }}</p>
-              <a href='{{ url_for("show", itemID=x.itemID) }}'>Product Description</a>
               <a class= "btn btn-primary" href='{{ url_for("add_to_cart", itemID=x.itemID) }}'><b>Add to Cart</b></a>
             </div>
           </div>
