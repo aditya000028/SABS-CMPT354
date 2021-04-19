@@ -1,7 +1,7 @@
 from flask import Flask, render_template, url_for, flash, redirect, request, Response
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 from forms import RegistrationForm, LoginForm, TimeSelectForm, EditInformationForm, ChangePasswordForm, AddForm, CheckoutForm, AdminDeleteForm
-from utilityFunctions import initialize_db, dict_factory, db_connection, item_name_path, check_unique_email, calculate_new_price
+from utilityFunctions import initialize_db, dict_factory, db_connection, item_name_path, check_unique_email, calculate_new_price, new_stock
 from classes.member import Member
 import datetime
 import time
@@ -214,20 +214,21 @@ def checkout():
     c.execute(query, str(current_user.id))
     
     cart_info = c.fetchall()
+
+    if len(cart_info) == 0:
+        flash(f"You must have an item in your cart to go to checkout", "info")
+        return redirect(url_for('home'))
     new_prices = []
+
     for item in cart_info:
-        # item_names.append(item["itemName"])
         new_prices.append(calculate_new_price(current_user.points, float(item["price"]), item["discountPercent"]))
 
     item_pictures_paths = item_name_path(cart_info)
 
     if checkout_form.validate_on_submit():
-        item_stock = []
         buys_table_updated = []
         for item in cart_info:
             receipt = "You have bought " + item["itemName"]
-            new_stock = item["stock"] - 1
-            item_stock.append([new_stock, item["objectID"]])
 
             buys_table_updated.append([item["objectID"], 
                                     item["itemName"],
@@ -251,9 +252,12 @@ def checkout():
         c.execute(points_query, (current_user.points, str(current_user.id)))
         conn.commit()
 
+        new_stock_items = new_stock(cart_info)
+        print(new_stock_items)
+
         # Update the stock of item purchased
         stock_query = "UPDATE item SET stock = (?) WHERE itemID = (?)"
-        c.executemany(stock_query, item_stock)
+        c.executemany(stock_query, new_stock_items)
         conn.commit()
 
         # Update the cart of member
