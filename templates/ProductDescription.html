@@ -10,7 +10,7 @@
             <h2><a class="article-title" >{{ item.itemName }}</a></h2>
             <p class="prodDescriptionPrice" id="price"><b>${{ item.price }} CAD</b></p>
             <p class="article-coNntent"><b>Brand: </b>{{ item.brand }}</p>
-            <p class="article-content"><b>Dimensions: </b>{{ item.size }}</p>
+            <p class="article-content"><b>Dimensions: </b>{{ item.size }} cm</p>
             <p class="article-content"><b>In Stock: </b>{{ item.stock }}</p>
             <a class="btn btn-primary" href='{{ url_for("add_to_cart", itemID=itemID) }}'><b>Add to Cart</b></a>
           </div>
