@@ -1,12 +1,15 @@
 from flask import Flask, render_template, url_for, flash, redirect, request, Response
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 from forms import RegistrationForm, LoginForm, TimeSelectForm, EditInformationForm, ChangePasswordForm, AddForm, CheckoutForm, AdminDeleteForm
-from utilityFunctions import initialize_db, dict_factory, db_connection, item_name_path, check_unique_email, calculate_new_price
+from utilityFunctions import initialize_db, dict_factory, db_connection, item_name_path, check_unique_email, calculate_new_price, new_stock
 from classes.member import Member
 import datetime
 import time
 import sqlite3
 from passlib.hash import pbkdf2_sha256
+
+# Initialize the db before the app starts running
+initialize_db()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
@@ -27,21 +30,22 @@ def load_member(member_id):
     else:        
         return Member(int(row[0]), row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12])
 
-# Initialize the db before the app starts running
-initialize_db()
-
 @app.route("/")
 @app.route("/home")
 def home():
-    query = "SELECT * FROM item"
-    if ('brand' in request.args and  request.args.get('brand', type=str) != ""):
-        query = "SELECT * FROM item WHERE brand=\"" + request.args.get('brand', type=str) + '\"'
+    items_query = "SELECT * FROM item"
+    if ('depName' in request.args and  request.args.get('depName', type=str) != ""):
+        items_query = "SELECT * FROM item WHERE depName=\"" + request.args.get('depName', type=str) + '\"'
 
     conn = db_connection()
     c = conn.cursor()
-    c.execute(query)
+    c.execute(items_query)
 
     items = c.fetchall()
+
+    department_num_items_query = "SELECT depName, COUNT(*) as 'num' FROM item GROUP BY depName"
+    c.execute(department_num_items_query)
+    num_items_dep = c.fetchall()
 
     # Create the path to display item images
     itemNamesList = []
@@ -51,7 +55,7 @@ def home():
         name = name + ".png"
         x['image'] = name
 
-    return render_template('home.html', items=items, item_names_list=itemNamesList, length=len(items))
+    return render_template('home.html', items=items, item_names_list=itemNamesList, num_items_dep=num_items_dep)
 
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -214,20 +218,21 @@ def checkout():
     c.execute(query, str(current_user.id))
     
     cart_info = c.fetchall()
+
+    if len(cart_info) == 0:
+        flash(f"You must have an item in your cart to go to checkout", "info")
+        return redirect(url_for('home'))
     new_prices = []
+
     for item in cart_info:
-        # item_names.append(item["itemName"])
         new_prices.append(calculate_new_price(current_user.points, float(item["price"]), item["discountPercent"]))
 
     item_pictures_paths = item_name_path(cart_info)
 
     if checkout_form.validate_on_submit():
-        item_stock = []
         buys_table_updated = []
         for item in cart_info:
             receipt = "You have bought " + item["itemName"]
-            new_stock = item["stock"] - 1
-            item_stock.append([new_stock, item["objectID"]])
 
             buys_table_updated.append([item["objectID"], 
                                     item["itemName"],
@@ -252,8 +257,9 @@ def checkout():
         conn.commit()
 
         # Update the stock of item purchased
+        new_stock_items = new_stock(cart_info)
         stock_query = "UPDATE item SET stock = (?) WHERE itemID = (?)"
-        c.executemany(stock_query, item_stock)
+        c.executemany(stock_query, new_stock_items)
         conn.commit()
 
         # Update the cart of member
@@ -373,9 +379,10 @@ def searchResults():
 
     matching_items = c.fetchall()
 
-    query = "SELECT COUNT(*) FROM item WHERE itemName LIKE (?)"
+    query = "SELECT COUNT(*) as 'num' FROM item WHERE itemName LIKE (?)"
     c.execute(query, [user_query])
-    num_results = int(c.fetchone())
+    num_results = int((c.fetchone())["num"])
+
     matching_items_images = item_name_path(matching_items)
 
     return render_template('searchResults.html', matching_items=matching_items, matching_items_images=matching_items_images, num_results=num_results, search_query=str(temp), title='Search results')
@@ -388,9 +395,57 @@ def show(itemID):
     query = "SELECT * FROM item WHERE itemID = (?)"
     c.execute(query, (temp,))
     item = c.fetchone()
-    return render_template('ProductDescription.html', item =item, title = 'Description' )
 
+    query = "SELECT rating, content FROM review WHERE itemID = (?)"
+    c.execute(query, (temp,))
+    reviews = c.fetchall()
 
+    name = "../static/images/"
+    name = name + str(item["itemName"]).replace(" ", "")
+    name = name + ".png"
+    item['image'] = name
+
+    return render_template('ProductDescription.html', item =item, title = 'Description', itemID = itemID, reviews = reviews, reviewsLen = len(reviews))
+
+@app.route('/submit/<itemID>', methods=['POST'])
+@login_required
+def submit(itemID):
+    conn = db_connection()
+    c = conn.cursor()
+    temp = str(itemID)
+    query = "SELECT COUNT(reviewNumber) FROM review"
+    c.execute(query, ())
+    numberOfReviews = c.fetchone()
+    numberOfReviews = numberOfReviews['COUNT(reviewNumber)']
+
+    query = "SELECT * FROM item WHERE itemID = (?)"
+    c.execute(query, (temp,))
+    item = c.fetchone()
+
+    review_query = "SELECT rating, content FROM review WHERE itemID = (?)"
+    c.execute(review_query, (temp,))
+    reviews = c.fetchall()
+
+    tempMember = current_user.id
+    query = "SELECT memberID FROM review WHERE memberID = (?) AND itemID = (?)"
+    c.execute(query, (tempMember, temp,))
+    memberIDArr = c.fetchall()
+    
+    if (len(memberIDArr) == 0):
+        query = "INSERT into review VALUES(?, ?, ?, ?, ?)"
+        c.execute(query, (numberOfReviews + 1, itemID, current_user.id, request.form['rating'], request.form['content']))
+        conn.commit()
+
+    review_query = "SELECT rating, content FROM review WHERE itemID = (?)"
+    c.execute(review_query, (temp,))
+    reviews = c.fetchall()
+
+    name = "../static/images/"
+    name = name + str(item["itemName"]).replace(" ", "")
+    name = name + ".png"
+    item['image'] = name
+
+    return render_template('ProductDescription.html', item =item, title = 'Description', itemID = itemID, reviews = reviews, reviewsLen = len(reviews))
 
 @app.route("/cart", methods=['GET'])
 @login_required
@@ -400,13 +455,14 @@ def cart():
      items_query = "SELECT * FROM cart,item WHERE cartID = (?) AND item.itemID IN( SELECT itemID FROM item WHERE itemID = objectID)"
      c.execute(items_query, str(current_user.id))
      items = c.fetchall()
-     print(items)
+
+     matching_items_images = item_name_path(items)
      
      sum = 0
      for x in items:
          sum = sum + x['price'] 
  
-     return render_template('cart.html', items = items, length = len(items), total = sum, title = 'cart')
+     return render_template('cart.html', items = items, matching_items_images = matching_items_images, length = len(items), total = sum, title = 'cart')
      
 
 
@@ -424,6 +480,27 @@ def add_to_cart(itemID):
      c.execute(query2,(current_user.id,item['itemID']))
      conn.commit()
      return redirect(url_for('cart'))
+
+@app.route('/home/<int:itemID>')
+@login_required
+def remove_from_cart(itemID):
+     conn = db_connection()
+     c = conn.cursor()
+     temp = str(itemID)
+     query = "DELETE FROM cart WHERE cartID = (?) AND objectID = (?)"
+     c.execute(query,(current_user.id,temp))
+     conn.commit()
+
+     items_query = "SELECT * FROM cart,item WHERE cartID = (?) AND item.itemID IN( SELECT itemID FROM item WHERE itemID = objectID)"
+     c.execute(items_query, str(current_user.id))
+     items = c.fetchall()
+     matching_items_images = item_name_path(items)
+     
+     sum = 0
+     for x in items:
+         sum = sum + x['price'] 
+     return render_template('cart.html', items = items, matching_items_images = matching_items_images, length = len(items), total = sum, title = 'cart')
+
 
 if __name__ == '__main__':
     app.run(debug=True)

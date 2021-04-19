@@ -347,10 +347,10 @@ Insert into item values (13, 'Airpods', 'Apple', '5x2x5', 249.99, 45, 0, 'Electr
 Insert into item values (14, 'Body Spray - Aqua', 'Axe', '2x2x5', 2.99, 250, 0, 'Home', 'SABS General Store');
 Insert into item values (15, 'Hole Puncher', 'Burklin', '10x5x5', 9.99, 100, 12, 'Stationery', 'SABS General Store');
 Insert into item values (16, 'Ruler', 'Burklin', '1x10x1', 2.99, 200, 15, 'Stationery', 'SABS General Store');
-Insert into item values (17, 'Coffee Pot', 'HolyCoffee', '20x30x20', 250.00, 50, 50, 'Appliance', 'SABS General Store');
+Insert into item values (17, 'Coffee Pot', 'HolyCoffee', '20x30x20', 250.00, 50, 50, 'Appliances', 'SABS General Store');
 Insert into item values (18, 'Hammer', 'Tougher', '2x15x5', 12.99, 75, 0, 'Hardware', 'SABS General Store');
 Insert into item values (19, 'Hockey Stick - Men Large', 'Bauer', '56x5x5', 94.99, 300, 0, 'Sporting', 'SABS General Store');
-Insert into item values (20, '20-pack Mini Bites', 'Entainment', '10x20x5', 15.99, 250, 0, 'Miscellaneous', 'SABS General Store');
+Insert into item values (20, '20-pack Mini Bites', 'Entenmann', '10x20x5', 15.99, 250, 0, 'Miscellaneous', 'SABS General Store');
 Insert into item values (21, 'Clipboard', 'Ready', '15x1x1', 5.99, 100, 0, 'Stationery', 'SABS General Store');
 Insert into item values (22, 'Dryer - Large Metallic', 'GG', '256x256x256', 1599.99, 25, 10, 'Appliances', 'SABS General Store');
 Insert into item values (23, 'Stove - Gas', 'GG', '300x300x300', 1899.99, 25, 10, 'Appliances', 'SABS General Store');
@@ -381,6 +381,12 @@ Insert into review values (2, 2, 2, 5, 'The Red pens 8-pack writes pretty good. 
 Insert into review values (3, 3, 3, 3, 'This bubblegum tastes disgusting');
 Insert into review values (4, 4, 4, 4, 'COD really picked it up this year');
 Insert into review values (5, 5, 5, 5, 'Best console ever');
+Insert into review values (6, 6, 6, 3, 'Hold an ok amount of water');
+Insert into review values (7, 7, 7, 5, 'Keeps my hands lotiony');
+Insert into review values (8, 8, 8, 2, 'Doesnt keep my armpits smelling fresh');
+Insert into review values (9, 9, 9, 5, 'Pencil is nice and pointy now');
+Insert into review values (11, 11, 11, 5, 'amazing tv with clear images');
+Insert into review values (20, 20, 20, 1, 'These taste terrible. Never buy them!!!');
 
 /* Add manages to table */
 Insert into manages values (1, 1);
