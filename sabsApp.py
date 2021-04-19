@@ -85,13 +85,14 @@ def home():
         name = name + ".png"
         x['image'] = name
 
-    c.execute("SELECT * FROM item GROUP BY brand")
+    c.execute("SELECT *, COUNT(*) as 'num' FROM item GROUP BY brand")
     brands = c.fetchall()
 
-    c.execute("SELECT * FROM item GROUP BY depName")
+    c.execute("SELECT depName, COUNT(*) as 'num' FROM item GROUP BY depName")
     departments = c.fetchall()
+    print(departments)
 
-    return render_template('home.html', items=items, brands = brands, departments = departments)
+    return render_template('home.html', items=items, brands = brands, departments = departments )
 
 
 @app.route("/register", methods=['GET', 'POST'])
