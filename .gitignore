@@ -4,3 +4,4 @@ venv/
 __pycache__/
 classes/__pycache__
 sabs.db
+sabs.db-journal
