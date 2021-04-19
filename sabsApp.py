@@ -46,7 +46,6 @@ def home():
         brand = request.form['javascript_data[brand]']
         stock = request.form['javascript_data[stock]']
         size = request.form['javascript_data[size]']
-        print(stock)
 
         # this sucks
         if (brand != '*' and department == "*" and stock == "false"):
@@ -66,7 +65,6 @@ def home():
     else:
         query = "SELECT * FROM item"
 
-    print(query)
 
     conn = db_connection()
     c = conn.cursor()
@@ -90,7 +88,6 @@ def home():
 
     c.execute("SELECT depName, COUNT(*) as 'num' FROM item GROUP BY depName")
     departments = c.fetchall()
-    print(departments)
 
     return render_template('home.html', items=items, brands = brands, departments = departments )
 
