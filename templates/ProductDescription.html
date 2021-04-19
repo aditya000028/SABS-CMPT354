@@ -1,14 +1,42 @@
 {% extends "layout.html" %}
 {% block content %}
         <article class="media">
-          <div class="media-body">
-            <div class="article-metadata">
-            <div class="rectangle"></div>
-            <h2><a class="article-title" >{{ item.itemName }}</a></h2>
-            <p class="article-content" id="price"><b>{{ item.price }}</b></p>
-            <p class="article-content"><b>Brand:</b>{{ item.brand }}</p>
-            <p class="article-content"><b>Dimensions:</b>{{ item.size }}</p>
-            <p class="article-content"><b>In Stock:</b>{{ item.stock }}</p>
+          
+          <div class="picture">
+            <img id="productpicture" src={{item.image}}>
           </div>
+  
+          <div class="item-description">
+            <h2><a class="article-title" >{{ item.itemName }}</a></h2>
+            <p class="prodDescriptionPrice" id="price"><b>${{ item.price }} CAD</b></p>
+            <p class="article-coNntent"><b>Brand: </b>{{ item.brand }}</p>
+            <p class="article-content"><b>Dimensions: </b>{{ item.size }} cm</p>
+            <p class="article-content"><b>In Stock: </b>{{ item.stock }}</p>
+            <a class="btn btn-primary" href='{{ url_for("add_to_cart", itemID=itemID) }}'><b>Add to Cart</b></a>
+          </div>
+
+          <div class="reviews-div">
+            
+            <h2>Reviews</h2>
+            <hr>
+            {% for x in range(reviewsLen) %}
+            <div class="review-body">
+                <p class="article-content"><b>{{ reviews[x].rating }} stars</b></p>
+                <hr>
+                <p class="article-content">{{ reviews[x].content }}</p>
+            </div>
+            {% endfor %} 
+            
+            <h2>Add Review</h2>
+            <hr>
+            <form action="{{ url_for('submit', itemID=itemID) }}" method="post">
+              <h5>Rating (Enter a number from 1 to 5)</h5>
+              <textarea id="review-textbox" name="rating"></textarea>
+              <h5>Review</h5>
+              <textarea id="review-textbox" name="content"></textarea>
+              <input class="mb-5" type="submit">
+            </form>
+            <!-- <a class="btn btn-primary" href='{{ url_for("add_to_cart", itemID=itemID) }}'><b>Add to Cart</b></a> -->
+          </div> 
         <article>
 {% endblock content %}
