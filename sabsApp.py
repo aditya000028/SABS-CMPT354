@@ -4,6 +4,7 @@ from forms import RegistrationForm, LoginForm, TimeSelectForm, EditInformationFo
 from utilityFunctions import initialize_db, dict_factory, db_connection, item_name_path, check_unique_email, calculate_new_price, new_stock
 from classes.member import Member
 import datetime
+import json
 import time
 import sqlite3
 from passlib.hash import pbkdf2_sha256
@@ -27,19 +28,49 @@ def load_member(member_id):
     row = cursor.fetchone()
     if row is None:
         return None
-    else:        
+    else:
         return Member(int(row[0]), row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12])
 
+# Initialize the db before the app starts running
+initialize_db()
+
+
+
+
+
 @app.route("/")
-@app.route("/home")
+@app.route("/home", methods = ['GET', 'POST'])
 def home():
-    items_query = "SELECT * FROM item"
-    if ('depName' in request.args and  request.args.get('depName', type=str) != ""):
-        items_query = "SELECT * FROM item WHERE depName=\"" + request.args.get('depName', type=str) + '\"'
+    if (request.method == 'POST'):
+        department = request.form['javascript_data[department]']
+        brand = request.form['javascript_data[brand]']
+        stock = request.form['javascript_data[stock]']
+        size = request.form['javascript_data[size]']
+        print(stock)
+
+        # this sucks
+        if (brand != '*' and department == "*" and stock == "false"):
+            query = ("SELECT * FROM item WHERE brand =\'%s\';" % (brand))
+        elif (brand == '*' and department != "*" and stock == "false"):
+            query = ("SELECT * FROM item WHERE depName =\'%s\';" % (department))
+        elif (brand != '*' and department != "*" and stock == "false"):
+            query = ("SELECT * FROM item WHERE depName =\'%s\'AND brand =\'%s\';" % (department, brand))
+        elif (brand != '*' and department == "*" and stock == "true"):
+            query = ("SELECT * FROM item WHERE brand =\'%s\' AND stock >= 1;" % (brand))
+        elif (brand == '*' and department != "*" and stock == "true"):
+            query = ("SELECT * FROM item WHERE depName =\'%s\' AND stock >= 1;" % (department))
+        elif (brand != '*' and department != "*" and stock == "true"):
+            query = ("SELECT * FROM item WHERE depName =\'%s\'AND brand =\'%s\' AND stock >= 1;" % (department, brand))
+        else:
+            query = "SELECT * FROM item"
+    else:
+        query = "SELECT * FROM item"
+
+    print(query)
 
     conn = db_connection()
     c = conn.cursor()
-    c.execute(items_query)
+    c.execute(query)
 
     items = c.fetchall()
 
@@ -48,14 +79,19 @@ def home():
     num_items_dep = c.fetchall()
 
     # Create the path to display item images
-    itemNamesList = []
     for x in items:
         name = "../static/images/"
         name = name + str(x["itemName"]).replace(" ", "")
         name = name + ".png"
         x['image'] = name
 
-    return render_template('home.html', items=items, item_names_list=itemNamesList, num_items_dep=num_items_dep)
+    c.execute("SELECT * FROM item GROUP BY brand")
+    brands = c.fetchall()
+
+    c.execute("SELECT * FROM item GROUP BY depName")
+    departments = c.fetchall()
+
+    return render_template('home.html', items=items, brands = brands, departments = departments)
 
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -83,15 +119,15 @@ def register():
 
         # Execute the query
         c.execute(query, (
-            registration_form.firstName.data, 
-            registration_form.lastName.data, 
-            registration_form.email.data, 
-            hashed_password, 
-            points, currentdate, companyName, 
+            registration_form.firstName.data,
+            registration_form.lastName.data,
+            registration_form.email.data,
+            hashed_password,
+            points, currentdate, companyName,
             registration_form.street_address.data,
             registration_form.city.data,
             registration_form.zip_code.data,
-            registration_form.province.data, 
+            registration_form.province.data,
             registration_form.birthdate.data
             ))
 
@@ -212,11 +248,11 @@ def checkout():
     checkout_form = CheckoutForm()
 
     query = "SELECT * FROM cart, item WHERE objectID = itemID AND cartID = (?)"
-    
+
     conn = db_connection()
     c = conn.cursor()
     c.execute(query, str(current_user.id))
-    
+
     cart_info = c.fetchall()
 
     if len(cart_info) == 0:
@@ -234,25 +270,25 @@ def checkout():
         for item in cart_info:
             receipt = "You have bought " + item["itemName"]
 
-            buys_table_updated.append([item["objectID"], 
+            buys_table_updated.append([item["objectID"],
                                     item["itemName"],
                                     item["brand"],
-                                    item["size"], 
-                                    item["price"], 
-                                    item["discountPercent"], 
+                                    item["size"],
+                                    item["price"],
+                                    item["discountPercent"],
                                     str(current_user.id),
                                     receipt,
                                     str(datetime.date.today()),
                                     item["cartID"]
                                     ])
-        
+
         # Update the member points
         points_query = "UPDATE member SET points = (?) WHERE memberID = (?)"
         if current_user.points == 10:
             current_user.points = 0
         else:
             current_user.points = current_user.points + 1
-            
+
         c.execute(points_query, (current_user.points, str(current_user.id)))
         conn.commit()
 
@@ -280,7 +316,7 @@ def checkout():
 
 @app.route("/profile/editInfo", methods=['GET', 'POST'])
 @login_required
-def editInfo(): 
+def editInfo():
 
     # Get the user informaiton first to diplay in the form
     conn = db_connection()
@@ -315,16 +351,16 @@ def editInfo():
 
         # Execute the query
         c.execute(query, (
-            form.firstName.data, 
-            form.lastName.data, 
-            form.email.data, 
-            form.birthdate.data, 
+            form.firstName.data,
+            form.lastName.data,
+            form.email.data,
+            form.birthdate.data,
             form.street_address.data,
             form.city.data,
             form.zip_code.data,
             form.province.data,
             str(current_user.id)
-            )) 
+            ))
 
         # Commit the changes
         conn.commit()
@@ -347,13 +383,13 @@ def changePassword():
         query = "SELECT member_password FROM member WHERE memberID = (?)"
         c.execute(query, str(current_user.id))
         old_pass = c.fetchone()
-        
+
         if pbkdf2_sha256.verify(change_password_form.old_password.data, old_pass["member_password"]):
-        
+
             query = "UPDATE member SET member_password = (?) WHERE memberID = (?)"
-            
+
             hashed_password = pbkdf2_sha256.hash(change_password_form.new_password.data)
-            
+
             c.execute(query, (hashed_password, str(current_user.id)))
             conn.commit()
 
@@ -363,7 +399,7 @@ def changePassword():
         else:
             flash(f"Unable to make changes: Your old password is incorrect", "danger")
 
-    return render_template('changePassword.html', change_password_form=change_password_form, title='Change Password') 
+    return render_template('changePassword.html', change_password_form=change_password_form, title='Change Password')
 
 @app.route('/searchResults')
 def searchResults():
@@ -377,15 +413,20 @@ def searchResults():
     query = "SELECT * FROM item WHERE itemName LIKE (?)"
     c.execute(query, [user_query])
 
-    matching_items = c.fetchall()
+    items = c.fetchall()
+    # Create the path to display item images
+    matching_items_images = []
+    for x in items:
+        name = "../static/images/"
+        name = name + str(x["itemName"]).replace(" ", "")
+        name = name + ".png"
+        x['image'] = name
 
     query = "SELECT COUNT(*) as 'num' FROM item WHERE itemName LIKE (?)"
     c.execute(query, [user_query])
     num_results = int((c.fetchone())["num"])
 
-    matching_items_images = item_name_path(matching_items)
-
-    return render_template('searchResults.html', matching_items=matching_items, matching_items_images=matching_items_images, num_results=num_results, search_query=str(temp), title='Search results')
+    return render_template('searchResults.html', items=items, title='Search results', num_results = num_results)
 
 @app.route("/ProductDescription/<itemID>")
 def show(itemID):
@@ -430,7 +471,7 @@ def submit(itemID):
     query = "SELECT memberID FROM review WHERE memberID = (?) AND itemID = (?)"
     c.execute(query, (tempMember, temp,))
     memberIDArr = c.fetchall()
-    
+
     if (len(memberIDArr) == 0):
         query = "INSERT into review VALUES(?, ?, ?, ?, ?)"
         c.execute(query, (numberOfReviews + 1, itemID, current_user.id, request.form['rating'], request.form['content']))
@@ -457,13 +498,13 @@ def cart():
      items = c.fetchall()
 
      matching_items_images = item_name_path(items)
-     
+
      sum = 0
      for x in items:
-         sum = sum + x['price'] 
- 
+         sum = sum + x['price']
+
      return render_template('cart.html', items = items, matching_items_images = matching_items_images, length = len(items), total = sum, title = 'cart')
-     
+
 
 
 @app.route('/cart/<int:itemID>')
@@ -495,10 +536,10 @@ def remove_from_cart(itemID):
      c.execute(items_query, str(current_user.id))
      items = c.fetchall()
      matching_items_images = item_name_path(items)
-     
+
      sum = 0
      for x in items:
-         sum = sum + x['price'] 
+         sum = sum + x['price']
      return render_template('cart.html', items = items, matching_items_images = matching_items_images, length = len(items), total = sum, title = 'cart')
 
 

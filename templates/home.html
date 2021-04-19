@@ -3,21 +3,47 @@
 {% set sort_on = request.args.sort_on|default('itemName') %}
 {% set depName = request.args.depName|default(null) %}
 <div class="row">
+    <div class="col-2 p-2 border rounded">
+      <div>
+        <h6 class="p-1 border-bottom">Department</h6>
+          <div class="list-group" id="deparmentgroup">
+            <a class="list-group-item list-group-item-action mb-2 rounded" id="*" data-toggle="list">Any</a>
+            {% for x in departments %}
+              <a class="list-group-item list-group-item-action mb-2 rounded" id="{{ x.depName }}" data-toggle="list">{{ x.depName }}</a>
+            {% endfor %}
+          </div>
+      </div>
+    <div>
+        <h6 class="p-1 border-bottom">Filter By</h6>
+        <div class="form-inline border rounded p-sm-2 my-2">
+            <input class="form-check-input" type="checkbox" id="instockcheck">
+          <label class="form-check-label" for="instockcheck">In Stock Only</label>
+        </div>
+
         <p>
-          <a data-toggle="collapse" href="#departmentgroup">Department</a>
+          <a data-toggle="collapse" href="#brandsgroup">Brand</a>
         </p>
-        <div id="departmentgroup" class="collapse">
-          <ul class="list-group">
-            <li class="list-group-item list-group-item-action mb-2 rounded"><a href="{{ url_for('home', sort_on=sort_on, depName='Appliances')}}">Appliances ({{ num_items_dep[0].num }})</a></li>
-            <li class="list-group-item list-group-item-action mb-2 rounded"><a href="{{ url_for('home', sort_on=sort_on, depName='Electronics')}}">Electronics ({{ num_items_dep[1].num }})</a></li>
-            <li class="list-group-item list-group-item-action mb-2 rounded"><a href="{{ url_for('home', sort_on=sort_on, depName='Hardware')}}">Hardware ({{ num_items_dep[2].num }})</a></li>
-            <li class="list-group-item list-group-item-action mb-2 rounded"><a href="{{ url_for('home', sort_on=sort_on, depName='Home')}}">Home ({{ num_items_dep[3].num }})</a></li>
-            <li class="list-group-item list-group-item-action mb-2 rounded"><a href="{{ url_for('home', sort_on=sort_on, depName='Miscellaneous')}}">Miscellaneous ({{ num_items_dep[4].num }})</a></li>
-            <li class="list-group-item list-group-item-action mb-2 rounded"><a href="{{ url_for('home', sort_on=sort_on, depName='Sporting')}}">Sporting ({{ num_items_dep[5].num }})</a></li>
-            <li class="list-group-item list-group-item-action mb-2 rounded"><a href="{{ url_for('home', sort_on=sort_on, depName='Stationery')}}">Stationery ({{ num_items_dep[6].num }})</a></li>
+        <div id="brandsgroup" class="collapse">
+            <div class="list-group" id="brandsgroupinner">
+              <a class="list-group-item list-group-item-action mb-2 rounded" id="*" data-toggle="list">Any</a>
+              {% for x in brands %}
+                <a class="list-group-item list-group-item-action mb-2 rounded" id="{{ x.brand }}" data-toggle="list">{{ x.brand }}</a>
+              {% endfor %}
+            </div>
         </ul>
         </div>
-    </div>
+        <div id="sizesgroup" class="collapse">
+          <div class="list-group" id="sizesgroupinner">
+            <a class="list-group-item list-group-item-action mb-2 rounded" id="*" data-toggle="list">Any</a>
+            <a class="list-group-item list-group-item-action mb-2 rounded" id="big" data-toggle="list">Big</a>
+            <a class="list-group-item list-group-item-action mb-2 rounded" id="medium" data-toggle="list">Medium</a>
+            <a class="list-group-item list-group-item-action mb-2 rounded" id="small" data-toggle="list">Small</a>
+          </div>
+        </div>
+      </div>
+      <hr/>
+      <button class="btn btn-outline-primary mb-2 rounded" onclick ="getFilters()">Apply Filters</btn>
+      <button class="btn btn-outline-warning mb-2 rounded"><a style="color: rgb(255, 174, 0); text-decoration: none;" href="{{ url_for('home')}}">Reset Filter</a></btn>
     </div>
     <div class="col-10">
       <div class="dropdown">
@@ -25,11 +51,11 @@
           Sort by
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-          <a class="dropdown-item {{'active' if sort_on == 'itemName' }}" href="{{ url_for('home', sort_on='itemName', depName=depName) }}">Item Name</a>
-          <a class="dropdown-item {{'active' if sort_on == 'brand' }}" href="{{ url_for('home', sort_on='brand', depName=depName) }}">Brand Name</a>
-          <a class="dropdown-item {{'active' if sort_on == 'stock' }}" href="{{ url_for('home', sort_on='stock', depName=depName) }}">Stock (asc)</a>
-          <a class="dropdown-item {{'active' if sort_on == 'price' }}" href="{{ url_for('home', sort_on='price', depName=depName) }}">Price (asc)</a>
-          <a class="dropdown-item {{'active' if sort_on == 'size' }}" href="{{ url_for('home', sort_on='size', depName=depName) }}">Size</a>
+          <a class="dropdown-item {{'active' if sort_on == 'itemName' }}" href="{{ url_for('home', sort_on='itemName') }}">Item Name</a>
+          <a class="dropdown-item {{'active' if sort_on == 'brand' }}" href="{{ url_for('home', sort_on='brand') }}">Brand Name</a>
+          <a class="dropdown-item {{'active' if sort_on == 'stock' }}" href="{{ url_for('home', sort_on='stock') }}">Stock (asc)</a>
+          <a class="dropdown-item {{'active' if sort_on == 'price' }}" href="{{ url_for('home', sort_on='price') }}">Price (asc)</a>
+          <a class="dropdown-item {{'active' if sort_on == 'size' }}" href="{{ url_for('home', sort_on='size') }}">Size</a>
         </div>
       </div>
       <div class="row p-2">
