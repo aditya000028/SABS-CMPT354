@@ -199,7 +199,7 @@ def pastPurchases():
         itemImgPath = item_name_path(purchases)
 
     for purchase in purchases:
-        purchase['date_of_purchase'] = datetime.datetime.utcfromtimestamp(purchase['date_of_purchase']).strftime('%Y-%m-%d %H:%M:%S')
+        purchase['date_of_purchase'] = datetime.datetime.utcfromtimestamp((purchase['date_of_purchase'])).strftime('%Y-%m-%d %H:%M:%S')
 
     return render_template('pastPurchases.html', purchases=purchases, itemImgPath=itemImgPath, length=len(purchases),  form=form, title='Past Purchases')
 
@@ -275,7 +275,7 @@ def checkout():
                                     item["discountPercent"],
                                     str(current_user.id),
                                     receipt,
-                                    str(datetime.date.today()),
+                                    (time.time()),
                                     item["cartID"]
                                     ])
 
