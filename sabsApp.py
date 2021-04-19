@@ -47,7 +47,6 @@ def home():
         stock = request.form['javascript_data[stock]']
         size = request.form['javascript_data[size]']
 
-        # this sucks
         if (brand != '*' and department == "*" and stock == "false"):
             query = ("SELECT * FROM item WHERE brand =\'%s\';" % (brand))
         elif (brand == '*' and department != "*" and stock == "false"):
