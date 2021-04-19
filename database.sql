@@ -347,7 +347,7 @@ Insert into item values (13, 'Airpods', 'Apple', '5x2x5', 249.99, 45, 0, 'Electr
 Insert into item values (14, 'Body Spray - Aqua', 'Axe', '2x2x5', 2.99, 250, 0, 'Home', 'SABS General Store');
 Insert into item values (15, 'Hole Puncher', 'Burklin', '10x5x5', 9.99, 100, 12, 'Stationery', 'SABS General Store');
 Insert into item values (16, 'Ruler', 'Burklin', '1x10x1', 2.99, 200, 15, 'Stationery', 'SABS General Store');
-Insert into item values (17, 'Coffee Pot', 'HolyCoffee', '20x30x20', 250.00, 50, 50, 'Appliance', 'SABS General Store');
+Insert into item values (17, 'Coffee Pot', 'HolyCoffee', '20x30x20', 250.00, 50, 50, 'Appliances', 'SABS General Store');
 Insert into item values (18, 'Hammer', 'Tougher', '2x15x5', 12.99, 75, 0, 'Hardware', 'SABS General Store');
 Insert into item values (19, 'Hockey Stick - Men Large', 'Bauer', '56x5x5', 94.99, 300, 0, 'Sporting', 'SABS General Store');
 Insert into item values (20, '20-pack Mini Bites', 'Entainment', '10x20x5', 15.99, 250, 0, 'Miscellaneous', 'SABS General Store');

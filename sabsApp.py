@@ -33,15 +33,19 @@ def load_member(member_id):
 @app.route("/")
 @app.route("/home")
 def home():
-    query = "SELECT * FROM item"
-    if ('brand' in request.args and  request.args.get('brand', type=str) != ""):
-        query = "SELECT * FROM item WHERE brand=\"" + request.args.get('brand', type=str) + '\"'
+    items_query = "SELECT * FROM item"
+    if ('depName' in request.args and  request.args.get('depName', type=str) != ""):
+        items_query = "SELECT * FROM item WHERE depName=\"" + request.args.get('depName', type=str) + '\"'
 
     conn = db_connection()
     c = conn.cursor()
-    c.execute(query)
+    c.execute(items_query)
 
     items = c.fetchall()
+
+    department_num_items_query = "SELECT depName, COUNT(*) as 'num' FROM item GROUP BY depName"
+    c.execute(department_num_items_query)
+    num_items_dep = c.fetchall()
 
     # Create the path to display item images
     itemNamesList = []
@@ -51,7 +55,7 @@ def home():
         name = name + ".png"
         x['image'] = name
 
-    return render_template('home.html', items=items, item_names_list=itemNamesList, length=len(items))
+    return render_template('home.html', items=items, item_names_list=itemNamesList, num_items_dep=num_items_dep)
 
 
 @app.route("/register", methods=['GET', 'POST'])
