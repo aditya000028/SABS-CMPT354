@@ -32,7 +32,7 @@
                     </div>
                     <div class="col">
                         <a href="#">
-                            <h3>{{ purchases[x].itemName }}</h3>
+                            <h2><a href='{{ url_for("show", itemID=purchases[x].itemID) }}'>{{ purchases[x].itemName }}</a></h2>
                         </a>
                         <h6>{{ purchases[x].brand }}</h6>
                         <h6>{{ purchases[x].size }}</h6>
