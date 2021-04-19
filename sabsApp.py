@@ -252,10 +252,8 @@ def checkout():
         c.execute(points_query, (current_user.points, str(current_user.id)))
         conn.commit()
 
-        new_stock_items = new_stock(cart_info)
-        print(new_stock_items)
-
         # Update the stock of item purchased
+        new_stock_items = new_stock(cart_info)
         stock_query = "UPDATE item SET stock = (?) WHERE itemID = (?)"
         c.executemany(stock_query, new_stock_items)
         conn.commit()
@@ -377,9 +375,10 @@ def searchResults():
 
     matching_items = c.fetchall()
 
-    query = "SELECT COUNT(*) FROM item WHERE itemName LIKE (?)"
+    query = "SELECT COUNT(*) as 'num' FROM item WHERE itemName LIKE (?)"
     c.execute(query, [user_query])
-    num_results = int(c.fetchone())
+    num_results = int((c.fetchone())["num"])
+
     matching_items_images = item_name_path(matching_items)
 
     return render_template('searchResults.html', matching_items=matching_items, matching_items_images=matching_items_images, num_results=num_results, search_query=str(temp), title='Search results')
@@ -452,7 +451,7 @@ def cart():
      items_query = "SELECT * FROM cart,item WHERE cartID = (?) AND item.itemID IN( SELECT itemID FROM item WHERE itemID = objectID)"
      c.execute(items_query, str(current_user.id))
      items = c.fetchall()
-     #print(items)
+
      matching_items_images = item_name_path(items)
      
      sum = 0

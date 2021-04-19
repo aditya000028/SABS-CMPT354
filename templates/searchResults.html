@@ -1,20 +1,25 @@
 {% extends "layout.html" %}
 {% block content %}
-    {% if length == 0 %}
-    <p>There are 0 results for your search. Try using different keywords</p>
+    {% if num_results == 0 %}
+    <h3>There are 0 results for '{{ search_query }}'. Try using different keywords</h3>
     {% else %}
-        {% for x in range(length) %}
+        {% for x in range(num_results) %}
             <article class="media">
             <div class="media-body">
                 <div class="article-metadata">
                     <p>Your search for <b>'{{ search_query }}'</b> yielded <b>{{ num_results }}</b> result(s)</p>
-                <div class="rectangle"></div>
-                <h2><a class="article-title" href="#">{{ matching_items[x].itemName }}</a></h2>
-                <p class="article-content" id="price"><b>{{ matching_items[x].price }}</b></p>
-                <p class="article-content"><b>Brand:</b>{{ matching_items[x].brand }}</p>
-                <p class="article-content"><b>Dimensions:</b>{{ matching_items[x].size }}</p>
-                <p class="article-content"><b>In Stock:</b>{{ matching_items[x].stock }}</p>
-                <img src={{matching_items_images[x]}}>
+                <div class="align-items-lg-center pt-5">
+                    <img class="img-fluid w-50 ml-lg-5 order-1 or-lg-2" id="productpicture" src={{matching_items_images[x]}}>
+                    <div class="media-body order-2 order-lg-1 pl-5">
+                      <h2><a href='{{ url_for("show", itemID=matching_items[x].itemID) }}'>{{ matching_items[x].itemName }}</a></h2>
+                      <p><b> {{ matching_items[x].price }}</b></p>
+                      <p><b>Discount Percent: </b>%{{ matching_items[x].discountPercent }}</p>
+                      <p><b>Brand:</b> {{ matching_items[x].brand }}</p>
+                      <p><b>Dimensions:</b> {{ matching_items[x].size }}</p>
+                      <p><b>In Stock:</b> {{ matching_items[x].stock }}</p>
+                      <a class= "btn btn-primary" href='{{ url_for("add_to_cart", itemID=matching_items[x].itemID) }}'><b>Add to Cart</b></a>
+                    </div>
+                </div>
             </div>
             <article>
         {% endfor %}
