@@ -3,5 +3,3 @@ venv/
 .DS_Store
 __pycache__/
 classes/__pycache__
-sabs.db
-sabs.db-journal
